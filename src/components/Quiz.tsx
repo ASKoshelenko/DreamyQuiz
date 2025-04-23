@@ -64,6 +64,16 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload }) => {
   const currentQuestion = questions[currentQuestionIndex];
   const totalQuestions = questions.length;
   const totalPages = Math.ceil(totalQuestions / pageSize);
+  const score = calculateScore();
+
+  // Add score display
+  const scoreDisplay = userAnswers[currentQuestion.id] ? (
+    <div className="mt-4 text-center">
+      <span className="text-lg font-semibold">
+        Current Score: {score}%
+      </span>
+    </div>
+  ) : null;
 
   const toggleLanguage = () => {
     setLanguage(prev => prev === 'en' ? 'ru' : 'en');
@@ -76,8 +86,6 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload }) => {
       setShowResult(false);
     }
   };
-
-  const score = calculateScore();
 
   const renderPagination = () => {
     const pages = [];
@@ -174,6 +182,7 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload }) => {
             </button>
           </div>
         </div>
+        {scoreDisplay}
         <div className="progress-container">
           <div className="progress-text">
             Question {currentQuestionIndex + 1} of {questions.length}
