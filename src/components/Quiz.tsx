@@ -110,15 +110,6 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload }) => {
   const totalPages = Math.ceil(totalQuestions / pageSize);
   const score = calculateScore();
 
-  // Add score display
-  const scoreDisplay = userAnswers[currentQuestion.id] ? (
-    <div className="mt-4 text-center">
-      <span className="text-lg font-semibold">
-        Current Score: {score}%
-      </span>
-    </div>
-  ) : null;
-
   const toggleLanguage = () => {
     setLanguage(prev => prev === 'en' ? 'ru' : 'en');
   };
