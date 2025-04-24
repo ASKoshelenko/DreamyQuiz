@@ -182,7 +182,17 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload }) => {
             </button>
           </div>
         </div>
-        {scoreDisplay}
+        <div className="mt-4">
+          <div className="text-center mb-2">
+            <span className="text-lg font-semibold">Total Score: {score}%</span>
+          </div>
+          <div className="w-full bg-gray-200 rounded-full h-2.5">
+            <div
+              className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
+              style={{ width: `${score}%` }}
+            ></div>
+          </div>
+        </div>
         <div className="progress-container">
           <div className="progress-text">
             Question {currentQuestionIndex + 1} of {questions.length}
