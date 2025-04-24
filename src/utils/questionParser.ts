@@ -6,91 +6,85 @@ export interface Question {
     label: string;
     text: string;
   }>;
-  correctAnswer: string | null;
+  correctAnswer: string | string[] | null;
   isInformational: boolean;
   hasTranslation: boolean;
+  isMultipleChoice?: boolean;
 }
 
 export function parseQuestions(markdownContent: string): Question[] {
   try {
     const questions: Question[] = [];
-    const blocks = markdownContent.split('✅ Q').filter(block => block.trim());
+    const blocks = markdownContent.split(/✅\s*Q\d+\s*/).filter(block => block.trim());
 
     blocks.forEach((block, index) => {
-      const lines = block.split('\n').map(line => line.trim()).filter(line => line);
       let questionText = '';
       let questionTextRu = '';
       let answers: Array<{ label: string; text: string }> = [];
-      let correctAnswer: string | null = null;
-      let isCollectingEnglish = false;
-      let isCollectingRussian = false;
+      let correctAnswer: string | string[] | null = null;
       let hasTranslation = false;
-      let seenAnswers = new Set<string>();
+      let isMultipleChoice = false;
 
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i];
+      // Check if this is a multiple choice question
+      if (block.includes('Select all that apply') || block.includes('Выберите все подходящие варианты')) {
+        isMultipleChoice = true;
+      }
 
-        // Skip empty lines and question number
-        if (!line || line.match(/^\d+$/)) continue;
-
-        // Check for English question start
-        if (line.includes('**Question:**') || line.includes('**English (Original):**')) {
-          isCollectingEnglish = true;
-          isCollectingRussian = false;
-          continue;
+      // Split block into English and Russian parts
+      const parts = block.split(/---\s*\*\*Русский \(Перевод\):\*\*/);
+      
+      // Process English part
+      let englishPart = parts[0];
+      if (englishPart) {
+        // Extract English question text
+        const questionMatch = englishPart.match(/\*\*(?:Question|English \(Original\)?):\*\*\s*([\s\S]*?)(?=\s*[A-D]\.|$)/);
+        if (questionMatch) {
+          questionText = questionMatch[1].trim();
         }
 
-        // Check for Russian translation start
-        if (line.includes('**Русский (Перевод):**')) {
-          isCollectingEnglish = false;
-          isCollectingRussian = true;
-          hasTranslation = true;
-          continue;
-        }
-
-        // Check for section separator
-        if (line === '---') {
-          isCollectingEnglish = false;
-          isCollectingRussian = false;
-          continue;
-        }
-
-        // Parse answer options (only in English section)
-        if (isCollectingEnglish) {
-          const answerMatch = line.match(/^([A-Z])\.\s*(.*?)(\s*✅)?$/);
+        // Extract answers and correct answer from English part
+        const answerLines = englishPart.split('\n');
+        answerLines.forEach(line => {
+          // Match answer lines
+          const answerMatch = line.match(/^([A-D])\.\s*(.+?)(?:\s*✅\s*)?$/);
           if (answerMatch) {
-            const [, label, text, isCorrect] = answerMatch;
-            if (!seenAnswers.has(label)) {
-              answers.push({ label, text: text.trim() });
-              seenAnswers.add(label);
-              if (isCorrect) {
+            const [, label, text] = answerMatch;
+            answers.push({ label, text: text.trim() });
+            
+            // Check if this is the correct answer
+            if (line.includes('✅')) {
+              if (isMultipleChoice) {
+                if (!Array.isArray(correctAnswer)) {
+                  correctAnswer = [];
+                }
+                (correctAnswer as string[]).push(label);
+              } else {
                 correctAnswer = label;
               }
             }
-            continue;
           }
-        }
-
-        // Collect question text
-        if (isCollectingEnglish && !line.includes('**NOTE:**') && !line.includes('**Question:**') && !line.includes('**English (Original):**')) {
-          questionText += (questionText ? '\n' : '') + line;
-        } else if (isCollectingRussian && !line.includes('**Примечание:**') && !line.includes('**Русский (Перевод):**')) {
-          questionTextRu += (questionTextRu ? '\n' : '') + line;
-        }
-      }
-
-      // Only add questions that have text
-      if (questionText.trim()) {
-        questions.push({
-          id: String(index + 1),
-          text: questionText.trim(),
-          textRu: hasTranslation ? questionTextRu.trim() : undefined,
-          answers,
-          correctAnswer,
-          isInformational: answers.length === 0,
-          hasTranslation
         });
       }
+
+      // Process Russian part if exists
+      if (parts[1]) {
+        hasTranslation = true;
+        questionTextRu = parts[1].split(/\s*[A-D]\./).shift()?.trim() || '';
+      }
+
+      // Create question object
+      const question: Question = {
+        id: (index + 1).toString(),
+        text: questionText,
+        textRu: questionTextRu || undefined,
+        answers,
+        correctAnswer,
+        isInformational: false,
+        hasTranslation,
+        isMultipleChoice
+      };
+
+      questions.push(question);
     });
 
     return questions;

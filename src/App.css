@@ -14,6 +14,24 @@
   font-weight: bold;
   color: #1f2937;
   margin-bottom: 1rem;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.app-header h1:hover {
+  transform: translateY(-1px);
+  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.app-header h1 svg {
+  transition: transform 0.2s ease;
+}
+
+.app-header h1:hover svg {
+  transform: translateY(-1px);
 }
 
 .app-header h2 {

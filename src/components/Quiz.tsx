@@ -8,19 +8,45 @@ interface QuizProps {
 
 const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [userAnswers, setUserAnswers] = useState<Record<string, string>>({});
+  const [userAnswers, setUserAnswers] = useState<Record<string, string | string[]>>({});
   const [showResult, setShowResult] = useState(false);
   const [language, setLanguage] = useState<'en' | 'ru'>('en');
   const [pageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
 
   const handleAnswer = useCallback((answer: string) => {
-    setUserAnswers(prev => ({
-      ...prev,
-      [questions[currentQuestionIndex].id]: answer
-    }));
+    const currentQuestion = questions[currentQuestionIndex];
+    
+    if (currentQuestion.isMultipleChoice) {
+      // Handle multiple choice answers
+      const currentAnswers = userAnswers[currentQuestion.id] as string[] || [];
+      
+      if (currentAnswers.includes(answer)) {
+        // Remove answer if already selected
+        setUserAnswers(prev => ({
+          ...prev,
+          [currentQuestion.id]: currentAnswers.filter(a => a !== answer)
+        }));
+      } else {
+        // Add answer if not selected
+        setUserAnswers(prev => ({
+          ...prev,
+          [currentQuestion.id]: [...currentAnswers, answer]
+        }));
+      }
+    } else {
+      // Handle single choice answers
+      setUserAnswers(prev => ({
+        ...prev,
+        [currentQuestion.id]: answer
+      }));
+      setShowResult(true);
+    }
+  }, [currentQuestionIndex, questions, userAnswers]);
+
+  const handleSubmitMultipleChoice = useCallback(() => {
     setShowResult(true);
-  }, [currentQuestionIndex, questions]);
+  }, []);
 
   const handleNext = useCallback(() => {
     if (currentQuestionIndex < questions.length - 1) {
@@ -40,10 +66,28 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload }) => {
     const answeredQuestions = Object.keys(userAnswers).length;
     if (answeredQuestions === 0) return 0;
 
-    const correctAnswers = Object.entries(userAnswers).filter(([id, answer]) => {
+    let correctAnswers = 0;
+    
+    Object.entries(userAnswers).forEach(([id, answer]) => {
       const question = questions.find(q => q.id === id);
-      return question && question.correctAnswer === answer;
-    }).length;
+      if (!question) return;
+      
+      if (question.isMultipleChoice) {
+        // For multiple choice, all correct answers must be selected and no incorrect ones
+        const userAnswerArray = answer as string[];
+        const correctAnswerArray = question.correctAnswer as string[];
+        
+        if (userAnswerArray.length === correctAnswerArray.length && 
+            userAnswerArray.every(a => correctAnswerArray.includes(a))) {
+          correctAnswers++;
+        }
+      } else {
+        // For single choice, just check if the answer matches
+        if (question.correctAnswer === answer) {
+          correctAnswers++;
+        }
+      }
+    });
 
     return Math.round((correctAnswers / answeredQuestions) * 100);
   }, [userAnswers, questions]);
@@ -224,6 +268,11 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload }) => {
             <p className="text-lg">
               {language === 'en' ? currentQuestion.text : (currentQuestion.textRu || currentQuestion.text)}
             </p>
+            {currentQuestion.isMultipleChoice && (
+              <p className="text-sm text-blue-600 mt-2 italic">
+                Select all that apply
+              </p>
+            )}
           </div>
 
           {currentQuestion.isInformational ? (
@@ -232,29 +281,55 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload }) => {
             </div>
           ) : (
             <div className="space-y-3">
-              {currentQuestion.answers.map((answer: Answer) => (
-                <button
-                  key={answer.label}
-                  onClick={() => handleAnswer(answer.label)}
-                  disabled={showResult}
-                  className={`w-full text-left p-4 sm:p-5 rounded-lg border transition-colors ${
-                    showResult
-                      ? answer.label === currentQuestion.correctAnswer
-                        ? 'bg-green-50 border-green-500 text-green-700'
-                        : userAnswers[currentQuestion.id] === answer.label
-                        ? 'bg-red-50 border-red-500 text-red-700'
-                        : 'border-gray-200 text-gray-600'
-                      : userAnswers[currentQuestion.id] === answer.label
-                      ? 'bg-blue-50 border-blue-500 text-blue-700'
-                      : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                  }`}
-                >
-                  <div className="flex items-center">
-                    <span className="font-semibold mr-3 text-lg">{answer.label}.</span>
-                    <span className="text-base sm:text-lg">{answer.text}</span>
-                  </div>
-                </button>
-              ))}
+              {currentQuestion.answers.map((answer: Answer) => {
+                const isSelected = currentQuestion.isMultipleChoice
+                  ? (userAnswers[currentQuestion.id] as string[] || []).includes(answer.label)
+                  : userAnswers[currentQuestion.id] === answer.label;
+                
+                const isCorrect = currentQuestion.isMultipleChoice
+                  ? (currentQuestion.correctAnswer as string[] || []).includes(answer.label)
+                  : currentQuestion.correctAnswer === answer.label;
+                
+                return (
+                  <button
+                    key={answer.label}
+                    onClick={() => handleAnswer(answer.label)}
+                    disabled={showResult && !currentQuestion.isMultipleChoice}
+                    className={`w-full text-left p-4 sm:p-5 rounded-lg border transition-colors ${
+                      showResult
+                        ? isCorrect
+                          ? 'bg-green-50 border-green-500 text-green-700'
+                          : isSelected
+                          ? 'bg-red-50 border-red-500 text-red-700'
+                          : 'border-gray-200 text-gray-600'
+                        : isSelected
+                        ? 'bg-blue-50 border-blue-500 text-blue-700'
+                        : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                    }`}
+                  >
+                    <div className="flex items-center">
+                      <span className="font-semibold mr-3 text-lg">{answer.label}.</span>
+                      <span className="text-base sm:text-lg">{answer.text}</span>
+                    </div>
+                  </button>
+                );
+              })}
+              
+              {currentQuestion.isMultipleChoice && !showResult && (
+                <div className="mt-4 flex justify-center">
+                  <button
+                    onClick={handleSubmitMultipleChoice}
+                    disabled={!(userAnswers[currentQuestion.id] as string[] || []).length}
+                    className={`px-6 py-3 rounded-lg text-white font-medium ${
+                      (userAnswers[currentQuestion.id] as string[] || []).length
+                        ? 'bg-blue-600 hover:bg-blue-700'
+                        : 'bg-gray-400 cursor-not-allowed'
+                    }`}
+                  >
+                    Submit Answer
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>

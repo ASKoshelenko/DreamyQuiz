@@ -9,6 +9,7 @@ export interface Question {
   textRu?: string;
   hasTranslation: boolean;
   answers: Answer[];
-  correctAnswer: string | null;
+  correctAnswer: string | string[] | null;
   isInformational: boolean;
+  isMultipleChoice?: boolean;
 } 

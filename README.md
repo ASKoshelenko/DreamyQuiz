@@ -12,6 +12,7 @@ A modern, responsive quiz application built with React and TypeScript, featuring
 - 🎨 Modern and clean UI
 - 📊 Score calculation
 - 🔍 Question preview
+- 📚 Built-in quiz selection (including AZ-400 certification questions)
 
 ## Getting Started
 
@@ -44,7 +45,14 @@ npm start
 
 The application will be available at `http://localhost:3000`
 
-## Question File Format
+## Using the Application
+
+### Quiz Selection
+- Choose from pre-built quizzes (like AZ-400 certification questions)
+- Upload your own markdown-formatted quiz files
+- Switch between different quizzes at any time
+
+### Question File Format
 
 The application accepts markdown files with questions in the following format:
 
@@ -74,6 +82,11 @@ D. Четвертый вариант
 - Answer options must start with a capital letter followed by a period (e.g., "A.")
 
 ## Features in Detail
+
+### Quiz Selection
+- Pre-built quiz options
+- Custom file upload option
+- Easy navigation between quizzes
 
 ### File Upload
 - Drag and drop support
