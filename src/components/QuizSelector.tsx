@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Question } from '../types';
-import { QuizInfo, availableQuizzes, loadQuestionsFromJson } from '../utils/quizManager';
+import { availableQuizzes, loadQuestionsFromJson } from '../utils/quizManager';
 
 interface QuizSelectorProps {
   onSelectQuiz: (questions: Question[], quizName: string) => void;
