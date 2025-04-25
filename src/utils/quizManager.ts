@@ -14,6 +14,12 @@ export const availableQuizzes: QuizInfo[] = [
     name: 'AZ-400 Certification Quiz',
     description: 'Microsoft Azure DevOps Solutions certification practice questions',
     fileName: 'az400-questions.json'
+  },
+  {
+    id: 'azure_devops',
+    name: 'Azure DevOps Practice',
+    description: 'Practice questions covering Azure DevOps concepts and features',
+    fileName: 'AzureDevOps.json'
   }
   // Новые квизы можно добавлять здесь
 ];
