@@ -42,7 +42,7 @@ echo "Creating backup in '$backup_dir'..."
 mkdir -p "$backup_dir"
 
 # Копируем только нужные файлы в папку бекапа
-cp Screenshot\ 2025-05-05*.png "$backup_dir/" 2>/dev/null
+cp Screenshot\ 2025-05-0*.png "$backup_dir/" 2>/dev/null
 echo "✓ Backup created successfully"
 echo
 
@@ -51,7 +51,7 @@ temp_file=$(mktemp)
 
 # Получаем ТОЛЬКО файлы, соответствующие точному паттерну
 file_found=false
-for file in Screenshot\ 2025-05-05*.png; do
+for file in Screenshot\ 2025-05-0*.png; do
     # Проверяем, что файл существует
     if [ -f "$file" ]; then
         file_found=true
@@ -68,14 +68,14 @@ for file in Screenshot\ 2025-05-05*.png; do
 done
 
 if [ "$file_found" = false ]; then
-    echo "Error: No files matching pattern 'Screenshot 2025-05-05*.png' found"
+    echo "Error: No files matching pattern 'Screenshot 2025-05-0*.png' found"
     rm "$temp_file"
     exit 1
 fi
 
 # Подсчитываем файлы
 file_count=$(cat "$temp_file" | wc -l)
-echo "Found $file_count files matching pattern 'Screenshot 2025-05-05*.png'"
+echo "Found $file_count files matching pattern 'Screenshot 2025-05-0*.png'"
 
 # Проверяем, достаточно ли файлов
 if [ "$file_count" -ne "$total_files" ]; then
@@ -87,7 +87,7 @@ echo
 
 # Сортируем файлы по времени и показываем предварительный просмотр
 echo "===== Preview of renaming operations ====="
-echo "ONLY files matching 'Screenshot 2025-05-05 at HH.MM.SS.png' will be renamed"
+echo "ONLY files matching 'Screenshot 2025-05-0 at HH.MM.SS.png' will be renamed"
 echo
 printf "%-5s | %-40s | %-10s\n" "No." "Before" "After"
 echo "------+------------------------------------------+------------"
@@ -157,7 +157,7 @@ rm "$temp_file"
 echo
 echo "Files in directory:"
 echo "Screenshot files (if any remain):"
-ls -la Screenshot\ 2025-05-05*.png 2>/dev/null || echo "No Screenshot files left"
+ls -la Screenshot\ 2025-05-0*.png 2>/dev/null || echo "No Screenshot files left"
 echo
 echo "New q-files:"
 ls -la q$start_number.png q$end_number.png 2>/dev/null || echo "No q-files found"
