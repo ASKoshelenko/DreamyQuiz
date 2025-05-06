@@ -12,4 +12,5 @@ export interface Question {
   correctAnswer: string | string[] | null;
   isInformational: boolean;
   isMultipleChoice?: boolean;
+  images?: string[]; // Array of image paths relative to public directory
 } 

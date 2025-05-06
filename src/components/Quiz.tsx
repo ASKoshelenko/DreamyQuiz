@@ -249,11 +249,27 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload }) => {
               onClick={toggleLanguage}
               className="px-4 py-2 text-sm rounded-lg bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors"
             >
-              {language === 'en' ? 'Показать на русском' : 'Show in English'}
+              {language === 'en' ? 'RU' : 'EN'}
             </button>
           )}
         </div>
-        
+
+        {/* Question Images */}
+        {currentQuestion.images && currentQuestion.images.length > 0 && (
+          <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+            {currentQuestion.images.map((imagePath, index) => (
+              <div key={index} className="relative">
+                <img
+                  src={imagePath}
+                  alt={`Question ${currentQuestion.id} image ${index + 1}`}
+                  className="w-full h-auto rounded-lg shadow-md"
+                  loading="lazy"
+                />
+              </div>
+            ))}
+          </div>
+        )}
+
         <div className="prose max-w-none">
           <div className="bg-gray-50 p-4 sm:p-6 rounded-lg mb-6">
             <p className="text-lg">
