@@ -265,17 +265,17 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload }) => {
 
         {/* Question Images */}
         {currentQuestion.images && currentQuestion.images.length > 0 && (
-          <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className={`mb-6 flex flex-col items-center ${currentQuestion.images.length > 1 ? 'md:grid md:grid-cols-2 gap-4' : ''}`}>
             {currentQuestion.images.map((imagePath, index) => (
-              <div key={index} className="relative">
+              <div key={index} className="relative flex justify-center items-center w-full">
                 <button
                   onClick={() => handleImageClick(imagePath)}
-                  className="w-full focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg"
+                  className="w-full max-w-[420px] focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg"
                 >
                   <img
                     src={imagePath}
                     alt={`Question ${currentQuestion.id} - ${index + 1}`}
-                    className="w-full h-auto rounded-lg shadow-md cursor-zoom-in hover:opacity-90 transition-opacity"
+                    className="mx-auto w-full h-auto rounded-lg shadow-md cursor-zoom-in hover:opacity-90 transition-opacity object-contain max-h-[320px] bg-white"
                     loading="lazy"
                   />
                 </button>
