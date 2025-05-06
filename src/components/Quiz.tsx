@@ -27,7 +27,6 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload }) => {
     return false;
   });
   const [showScrollTop, setShowScrollTop] = useState(false);
-  const scrollTopRef = useRef<HTMLDivElement>(null);
   const questionBlockRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -162,10 +161,6 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload }) => {
   const totalQuestions = questions.length;
   const totalPages = Math.ceil(totalQuestions / pageSize);
   const score = calculateScore();
-
-  const toggleLanguage = () => {
-    setLanguage(prev => prev === 'en' ? 'ru' : 'en');
-  };
 
   const goToPage = (page: number) => {
     if (page >= 1 && page <= totalPages) {
