@@ -13,9 +13,10 @@ interface QuizProps {
   darkMode: boolean;
   setDarkMode: (dark: boolean) => void;
   resetQuiz: () => void;
+  onShuffle: () => void;
 }
 
-const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setLanguage, darkMode, setDarkMode, resetQuiz }) => {
+const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setLanguage, darkMode, setDarkMode, resetQuiz, onShuffle }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [userAnswers, setUserAnswers] = useState<Record<string, string | string[]>>({});
   const [showResult, setShowResult] = useState(false);
@@ -243,8 +244,16 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
                   style={{ width: `${score}%` }}
                 ></div>
               </div>
-              <div className="text-center mt-2 text-gray-700 dark:text-gray-200 font-semibold text-base">
-                Question {currentQuestionIndex + 1} of {questions.length}
+              <div className="flex justify-between items-center mt-2">
+                <div className="text-gray-700 dark:text-gray-200 font-semibold text-base">
+                  Question {currentQuestionIndex + 1} of {questions.length}
+                </div>
+                <button
+                  onClick={onShuffle}
+                  className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors duration-200"
+                >
+                  Shuffle Questions
+                </button>
               </div>
             </div>
 

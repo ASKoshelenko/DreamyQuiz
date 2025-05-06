@@ -4,10 +4,12 @@ import Quiz from './components/Quiz';
 import QuizSelector from './components/QuizSelector';
 import { Question, parseQuestions } from './utils/questionParser';
 import MinimalHeader from './components/MinimalHeader';
+import { shuffleArray } from './utils/shuffle';
 import './App.css';
 
 function App() {
   const [questions, setQuestions] = useState<Question[]>([]);
+  const [shuffledQuestions, setShuffledQuestions] = useState<Question[]>([]);
   const [isFileUploaded, setIsFileUploaded] = useState(false);
   const [showQuizSelector, setShowQuizSelector] = useState(true);
   const [language, setLanguage] = useState<'en' | 'ru'>('en');
@@ -22,12 +24,14 @@ function App() {
   const handleFileUpload = (content: string, fileName: string) => {
     const parsedQuestions = parseQuestions(content);
     setQuestions(parsedQuestions);
+    setShuffledQuestions(parsedQuestions);
     setIsFileUploaded(true);
     setShowQuizSelector(false);
   };
 
   const handleQuizSelect = (selectedQuestions: Question[], quizName: string) => {
     setQuestions(selectedQuestions);
+    setShuffledQuestions(selectedQuestions);
     setIsFileUploaded(true);
     setShowQuizSelector(false);
   };
@@ -35,7 +39,12 @@ function App() {
   const handleReturnToUpload = () => {
     setIsFileUploaded(false);
     setQuestions([]);
+    setShuffledQuestions([]);
     setShowQuizSelector(true);
+  };
+
+  const handleShuffleQuestions = () => {
+    setShuffledQuestions(shuffleArray(questions));
   };
 
   return (
@@ -57,13 +66,14 @@ function App() {
           <FileUpload onFileUpload={handleFileUpload} />
         ) : (
           <Quiz 
-            questions={questions} 
+            questions={shuffledQuestions} 
             onReturnToUpload={handleReturnToUpload}
             language={language}
             setLanguage={setLanguage}
             darkMode={darkMode}
             setDarkMode={setDarkMode}
             resetQuiz={handleReturnToUpload}
+            onShuffle={handleShuffleQuestions}
           />
         )}
       </main>
