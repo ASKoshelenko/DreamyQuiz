@@ -13,6 +13,7 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload }) => {
   const [language, setLanguage] = useState<'en' | 'ru'>('en');
   const [pageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
+  const [modalImage, setModalImage] = useState<string | null>(null);
 
   const handleAnswer = useCallback((answer: string) => {
     const currentQuestion = questions[currentQuestionIndex];
@@ -98,6 +99,14 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload }) => {
     setShowResult(false);
     setCurrentPage(1);
     setLanguage('en');
+  }, []);
+
+  const handleImageClick = useCallback((imagePath: string) => {
+    setModalImage(imagePath);
+  }, []);
+
+  const closeModal = useCallback(() => {
+    setModalImage(null);
   }, []);
 
   // Guard clause for empty questions array
@@ -259,17 +268,47 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload }) => {
           <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
             {currentQuestion.images.map((imagePath, index) => (
               <div key={index} className="relative">
-                <img
-                  src={imagePath}
-                  alt={`Question ${currentQuestion.id} image ${index + 1}`}
-                  className="w-full h-auto rounded-lg shadow-md"
-                  loading="lazy"
-                />
+                <button
+                  onClick={() => handleImageClick(imagePath)}
+                  className="w-full focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg"
+                >
+                  <img
+                    src={imagePath}
+                    alt={`Question ${currentQuestion.id} - ${index + 1}`}
+                    className="w-full h-auto rounded-lg shadow-md cursor-zoom-in hover:opacity-90 transition-opacity"
+                    loading="lazy"
+                  />
+                </button>
               </div>
             ))}
           </div>
         )}
-
+        
+        {/* Modal for enlarged image */}
+        {modalImage && (
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center p-4"
+            onClick={closeModal}
+          >
+            <div className="max-w-full max-h-full relative" onClick={(e) => e.stopPropagation()}>
+              <img
+                src={modalImage}
+                alt="Enlarged view"
+                className="max-w-full max-h-[90vh] object-contain"
+              />
+              <button 
+                onClick={closeModal}
+                className="absolute top-2 right-2 bg-white rounded-full p-2 text-gray-800 hover:bg-gray-200"
+                aria-label="Close"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        )}
+        
         <div className="prose max-w-none">
           <div className="bg-gray-50 p-4 sm:p-6 rounded-lg mb-6">
             <p className="text-lg">
