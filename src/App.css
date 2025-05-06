@@ -1,7 +1,9 @@
 .app-container {
   min-height: 100vh;
-  padding: 2rem;
-  background-color: #f3f4f6;
+  width: 100vw;
+  padding: 0;
+  margin: 0;
+  background: linear-gradient(135deg, #1e3a8a 0%, #111827 60%, #db2777 100%);
 }
 
 .app-header {
@@ -40,8 +42,13 @@
 }
 
 .app-content {
-  max-width: 1200px;
-  margin: 0 auto;
+  width: 100vw;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 /* Quiz Controls */

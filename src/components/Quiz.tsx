@@ -8,24 +8,20 @@ import { Pagination } from 'swiper/modules';
 interface QuizProps {
   questions: Question[];
   onReturnToUpload: () => void;
+  language: 'en' | 'ru';
+  setLanguage: (lang: 'en' | 'ru') => void;
+  darkMode: boolean;
+  setDarkMode: (dark: boolean) => void;
+  resetQuiz: () => void;
 }
 
-const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload }) => {
+const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setLanguage, darkMode, setDarkMode, resetQuiz }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [userAnswers, setUserAnswers] = useState<Record<string, string | string[]>>({});
   const [showResult, setShowResult] = useState(false);
-  const [language, setLanguage] = useState<'en' | 'ru'>('en');
   const [pageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [modalImage, setModalImage] = useState<string | null>(null);
-  // Dark mode state
-  const [darkMode, setDarkMode] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('theme') === 'dark' ||
-        (localStorage.getItem('theme') === null && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    }
-    return false;
-  });
   const [showScrollTop, setShowScrollTop] = useState(false);
   const questionBlockRef = useRef<HTMLDivElement>(null);
 
@@ -124,14 +120,6 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload }) => {
 
     return Math.round((correctAnswers / answeredQuestions) * 100);
   }, [userAnswers, questions]);
-
-  const resetQuiz = useCallback(() => {
-    setCurrentQuestionIndex(0);
-    setUserAnswers({});
-    setShowResult(false);
-    setCurrentPage(1);
-    setLanguage('en');
-  }, []);
 
   const handleImageClick = useCallback((imagePath: string) => {
     setModalImage(imagePath);
@@ -241,153 +229,110 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-100 via-white to-pink-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-500 flex flex-col">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 flex-1 w-full">
-        <div className="quiz-header flex flex-col sm:flex-row justify-between items-center mb-4">
-          <div className="quiz-controls flex-1">
-            <div className="mt-4 sm:mt-0 flex items-center gap-2 absolute top-4 right-4 z-20">
-              <button
-                onClick={resetQuiz}
-                className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-blue-100 dark:hover:bg-blue-800 transition-colors"
-                aria-label="Start Over"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600 dark:text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                </svg>
-              </button>
-              <button
-                onClick={() => setLanguage('en')}
-                className={`p-2 rounded-full ${language === 'en' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-blue-100 dark:hover:bg-blue-800'}`}
-                aria-label="English"
-              >EN</button>
-              <button
-                onClick={() => setLanguage('ru')}
-                className={`p-2 rounded-full ${language === 'ru' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-blue-100 dark:hover:bg-blue-800'}`}
-                aria-label="Russian"
-              >RU</button>
-              <button
-                onClick={() => setDarkMode((prev) => !prev)}
-                className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
-                aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
-              >
-                {darkMode ? (
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m8.66-13.66l-.71.71M4.05 19.07l-.71.71M21 12h-1M4 12H3m16.66 5.66l-.71-.71M4.05 4.93l-.71-.71M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                  </svg>
-                ) : (
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z" />
-                  </svg>
-                )}
-              </button>
+    <div className="min-h-screen w-full bg-gradient-to-br from-blue-900 via-gray-900 to-pink-900 flex flex-col items-center justify-center transition-colors duration-500">
+      <div className="w-full max-w-5xl flex-1 flex flex-col justify-center items-center px-2 sm:px-6 py-8">
+        <div ref={questionBlockRef} className="w-full flex flex-col items-center">
+          <div className="w-full rounded-2xl shadow-2xl p-8 sm:p-12 bg-white/10 dark:bg-gray-900/70 backdrop-blur-xl transition-all duration-500 max-w-3xl mx-auto">
+            <div className="mb-6">
+              <div className="text-center mb-2">
+                <span className="text-lg font-semibold text-gray-900 dark:text-white">Total Score: {score}%</span>
+              </div>
+              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                <div
+                  className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
+                  style={{ width: `${score}%` }}
+                ></div>
+              </div>
+              <div className="text-center mt-2 text-gray-700 dark:text-gray-200 font-semibold text-base">
+                Question {currentQuestionIndex + 1} of {questions.length}
+              </div>
             </div>
-          </div>
-          <div className="mt-4">
-            <div className="text-center mb-2">
-              <span className="text-lg font-semibold text-gray-900 dark:text-white">Total Score: {score}%</span>
-            </div>
-            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
-              <div
-                className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
-                style={{ width: `${score}%` }}
-              ></div>
-            </div>
-            <div className="text-center mt-2 text-gray-700 dark:text-gray-200 font-semibold text-base">
-              Question {currentQuestionIndex + 1} of {questions.length}
-            </div>
-          </div>
-        </div>
 
-        <div ref={questionBlockRef} className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md rounded-2xl shadow-2xl p-8 transition-all duration-500">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 dark:text-white drop-shadow">Question {currentQuestion.id}</h2>
-          </div>
-
-          {/* Question Images */}
-          {currentQuestion.images && currentQuestion.images.length > 0 && (
-            <div className="mb-6 w-full flex flex-col items-center">
-              <Swiper
-                spaceBetween={10}
-                slidesPerView={1}
-                pagination={{ clickable: true }}
-                modules={[Pagination]}
-                style={{ maxWidth: 420, width: '100%', margin: '0 auto', marginBottom: 24 }}
-              >
-                {currentQuestion.images.map((imagePath, index) => (
-                  <SwiperSlide key={index}>
-                    <button
-                      onClick={() => handleImageClick(imagePath)}
-                      className="w-full focus:outline-none focus:ring-2 focus:ring-pink-400 rounded-xl shadow-lg hover:scale-105 transition-transform"
-                    >
-                      <img
-                        src={imagePath}
-                        alt={`Question ${currentQuestion.id} - ${index + 1}`}
-                        className="mx-auto w-full h-auto rounded-xl shadow-md cursor-zoom-in hover:opacity-90 transition-opacity object-contain max-h-[320px] bg-white"
-                        loading="lazy"
-                      />
-                    </button>
-                  </SwiperSlide>
-                ))}
-              </Swiper>
-            </div>
-          )}
-          
-          {/* Modal for enlarged image */}
-          {modalImage && (
-            <div 
-              className="fixed inset-0 bg-black/70 dark:bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-all duration-300"
-              onClick={closeModal}
-            >
-              <div className="bg-white/90 dark:bg-gray-900/90 rounded-2xl shadow-2xl p-4 relative max-w-full max-h-full" onClick={(e) => e.stopPropagation()}>
-                <img
-                  src={modalImage}
-                  alt="Enlarged view"
-                  className="max-w-full max-h-[90vh] object-contain bg-white dark:bg-gray-900 rounded-xl"
-                />
-                <button 
-                  onClick={closeModal}
-                  className="absolute top-2 right-2 bg-white dark:bg-gray-800 rounded-full p-2 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 shadow-lg"
-                  aria-label="Close"
+            {/* Question Images */}
+            {currentQuestion.images && currentQuestion.images.length > 0 && (
+              <div className="mb-6 w-full flex flex-col items-center">
+                <Swiper
+                  spaceBetween={10}
+                  slidesPerView={1}
+                  pagination={{ clickable: true }}
+                  modules={[Pagination]}
+                  style={{ maxWidth: 420, width: '100%', margin: '0 auto', marginBottom: 24 }}
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
+                  {currentQuestion.images.map((imagePath, index) => (
+                    <SwiperSlide key={index}>
+                      <button
+                        onClick={() => handleImageClick(imagePath)}
+                        className="w-full focus:outline-none focus:ring-2 focus:ring-pink-400 rounded-xl shadow-lg hover:scale-105 transition-transform"
+                      >
+                        <img
+                          src={imagePath}
+                          alt={`Question ${currentQuestion.id} - ${index + 1}`}
+                          className="mx-auto w-full h-auto rounded-xl shadow-md cursor-zoom-in hover:opacity-90 transition-opacity object-contain max-h-[320px] bg-white"
+                          loading="lazy"
+                        />
+                      </button>
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
               </div>
-            </div>
-          )}
-          
-          <div className="prose max-w-none dark:prose-invert text-gray-900 dark:text-white">
-            <div className="bg-gray-50/80 dark:bg-gray-800/80 p-4 sm:p-6 rounded-xl mb-6 transition-colors duration-300 shadow-sm">
-              <p className="text-lg dark:text-white">
-                {language === 'en' ? currentQuestion.text : (currentQuestion.textRu || currentQuestion.text)}
-              </p>
-              {currentQuestion.isMultipleChoice && (
-                <p className="text-sm text-pink-600 mt-2 italic font-semibold">
-                  Select all that apply
+            )}
+            
+            {/* Modal for enlarged image */}
+            {modalImage && (
+              <div 
+                className="fixed inset-0 bg-black/70 dark:bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-all duration-300"
+                onClick={closeModal}
+              >
+                <div className="bg-white/90 dark:bg-gray-900/90 rounded-2xl shadow-2xl p-4 relative max-w-full max-h-full" onClick={(e) => e.stopPropagation()}>
+                  <img
+                    src={modalImage}
+                    alt="Enlarged view"
+                    className="max-w-full max-h-[90vh] object-contain bg-white dark:bg-gray-900 rounded-xl"
+                  />
+                  <button 
+                    onClick={closeModal}
+                    className="absolute top-2 right-2 bg-white dark:bg-gray-800 rounded-full p-2 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 shadow-lg"
+                    aria-label="Close"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            )}
+            
+            <div className="prose max-w-none dark:prose-invert text-gray-900 dark:text-white">
+              <div className="bg-gray-50/80 dark:bg-gray-800/80 p-4 sm:p-6 rounded-xl mb-6 transition-colors duration-300 shadow-sm">
+                <p className="text-lg dark:text-white">
+                  {language === 'en' ? currentQuestion.text : (currentQuestion.textRu || currentQuestion.text)}
                 </p>
-              )}
-            </div>
-
-            {currentQuestion.isInformational ? (
-              <div className="bg-blue-50 dark:bg-blue-900 p-4 rounded-lg">
-                <p className="text-blue-700 dark:text-blue-200">This is an informational question. Read and understand the content.</p>
+                {currentQuestion.isMultipleChoice && (
+                  <p className="text-sm text-pink-600 mt-2 italic font-semibold">
+                    Select all that apply
+                  </p>
+                )}
               </div>
-            ) : (
-              <div className="space-y-3">
-                {currentQuestion.answers.map((answer: Answer) => {
-                  const isSelected = currentQuestion.isMultipleChoice
-                    ? (userAnswers[currentQuestion.id] as string[] || []).includes(answer.label)
-                    : userAnswers[currentQuestion.id] === answer.label;
-                  const isCorrect = currentQuestion.isMultipleChoice
-                    ? (currentQuestion.correctAnswer as string[] || []).includes(answer.label)
-                    : currentQuestion.correctAnswer === answer.label;
-                  return (
-                    <button
-                      key={answer.label}
-                      onClick={() => handleAnswer(answer.label)}
-                      disabled={showResult && !currentQuestion.isMultipleChoice}
-                      className={`w-full text-left p-4 sm:p-5 rounded-xl border-2 font-semibold text-lg shadow-sm transition-all duration-200
+
+              {currentQuestion.isInformational ? (
+                <div className="bg-blue-50 dark:bg-blue-900 p-4 rounded-lg">
+                  <p className="text-blue-700 dark:text-blue-200">This is an informational question. Read and understand the content.</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {currentQuestion.answers.map((answer: Answer) => {
+                    const isSelected = currentQuestion.isMultipleChoice
+                      ? (userAnswers[currentQuestion.id] as string[] || []).includes(answer.label)
+                      : userAnswers[currentQuestion.id] === answer.label;
+                    const isCorrect = currentQuestion.isMultipleChoice
+                      ? (currentQuestion.correctAnswer as string[] || []).includes(answer.label)
+                      : currentQuestion.correctAnswer === answer.label;
+                    return (
+                      <button
+                        key={answer.label}
+                        onClick={() => handleAnswer(answer.label)}
+                        disabled={showResult && !currentQuestion.isMultipleChoice}
+                        className={`w-full text-left p-4 sm:p-5 rounded-xl border-2 font-semibold text-lg shadow-sm transition-all duration-200
                         ${showResult
                           ? isCorrect
                             ? 'bg-green-500 border-green-600 text-white font-bold shadow-lg'
@@ -397,33 +342,34 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload }) => {
                           : isSelected
                           ? 'bg-blue-600 border-blue-700 text-white font-bold scale-105 shadow-lg'
                           : 'border-gray-200 text-gray-900 dark:text-white hover:bg-gradient-to-r hover:from-blue-500 hover:to-pink-500 hover:text-white hover:font-bold'}
-                      `}
-                    >
-                      <div className="flex items-center">
-                        <span className="font-bold mr-3 text-xl">{answer.label}.</span>
-                        <span className="text-base sm:text-lg">{answer.text}</span>
-                      </div>
-                    </button>
-                  );
-                })}
-                
-                {currentQuestion.isMultipleChoice && !showResult && (
-                  <div className="mt-4 flex justify-center">
-                    <button
-                      onClick={handleSubmitMultipleChoice}
-                      disabled={!(userAnswers[currentQuestion.id] as string[] || []).length}
-                      className={`px-8 py-3 rounded-full text-white font-bold shadow-lg text-lg transition-all duration-200
-                        ${(userAnswers[currentQuestion.id] as string[] || []).length
-                          ? 'bg-gradient-to-r from-blue-500 to-pink-500 hover:scale-105 hover:shadow-xl'
-                          : 'bg-gray-400 cursor-not-allowed'}
-                      `}
-                    >
-                      Submit
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
+                        `}
+                      >
+                        <div className="flex items-center">
+                          <span className="font-bold mr-3 text-xl">{answer.label}.</span>
+                          <span className="text-base sm:text-lg">{answer.text}</span>
+                        </div>
+                      </button>
+                    );
+                  })}
+                  
+                  {currentQuestion.isMultipleChoice && !showResult && (
+                    <div className="mt-4 flex justify-center">
+                      <button
+                        onClick={handleSubmitMultipleChoice}
+                        disabled={!(userAnswers[currentQuestion.id] as string[] || []).length}
+                        className={`px-8 py-3 rounded-full text-white font-bold shadow-lg text-lg transition-all duration-200
+                          ${(userAnswers[currentQuestion.id] as string[] || []).length
+                            ? 'bg-gradient-to-r from-blue-500 to-pink-500 hover:scale-105 hover:shadow-xl'
+                            : 'bg-gray-400 cursor-not-allowed'}
+                        `}
+                      >
+                        Submit
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -457,8 +403,8 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload }) => {
 
         {renderPagination()}
 
-        <div className="mt-8 bg-white/80 dark:bg-gray-900/80 rounded-2xl shadow-lg p-4 transition-all duration-500">
-          <h3 className="text-lg font-bold mb-4 text-gray-900 dark:text-white">Question Navigator</h3>
+        <div className="mt-8 bg-white/10 dark:bg-gray-900/70 rounded-2xl shadow-lg p-4 transition-all duration-500 max-w-3xl w-full mx-auto">
+          <h3 className="text-lg font-bold mb-4 text-white">Question Navigator</h3>
           <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-2">
             {questions.map((question, index) => (
               <button
