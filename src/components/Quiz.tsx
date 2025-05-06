@@ -209,7 +209,7 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload }) => {
             Start Over
           </button>
           <button onClick={onReturnToUpload} className="control-button">
-            Upload Different File
+            Choose Different Quiz
           </button>
           <div className="language-toggle">
             <button
