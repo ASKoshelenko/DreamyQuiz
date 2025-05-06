@@ -130,6 +130,16 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
     setModalImage(null);
   }, []);
 
+  // Закрытие модального окна по Escape
+  React.useEffect(() => {
+    if (!modalImage) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeModal();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [modalImage, closeModal]);
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -250,9 +260,12 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
                 </div>
                 <button
                   onClick={onShuffle}
-                  className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors duration-200"
+                  className="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full transition-colors duration-200 flex items-center justify-center"
+                  aria-label="Shuffle Questions"
                 >
-                  Shuffle Questions
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356-2A9 9 0 106.097 19.423M20 9V4h-5" />
+                  </svg>
                 </button>
               </div>
             </div>
@@ -265,19 +278,22 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
                   slidesPerView={1}
                   pagination={{ clickable: true }}
                   modules={[Pagination]}
-                  style={{ maxWidth: 420, width: '100%', margin: '0 auto', marginBottom: 24 }}
+                  className="w-full max-w-3xl"
+                  style={{ margin: '0 auto', marginBottom: 24 }}
                 >
                   {currentQuestion.images.map((imagePath, index) => (
                     <SwiperSlide key={index}>
                       <button
                         onClick={() => handleImageClick(imagePath)}
-                        className="w-full focus:outline-none focus:ring-2 focus:ring-pink-400 rounded-xl shadow-lg hover:scale-105 transition-transform"
+                        className="w-full focus:outline-none focus:ring-2 focus:ring-pink-400 rounded-xl shadow-xl hover:scale-105 transition-transform duration-300 bg-white dark:bg-gray-900"
+                        style={{ display: 'block' }}
                       >
                         <img
                           src={imagePath}
                           alt={`Question ${currentQuestion.id} - ${index + 1}`}
                           className="mx-auto w-full h-auto rounded-xl shadow-md cursor-zoom-in hover:opacity-90 transition-opacity object-contain max-h-[320px] bg-white"
                           loading="lazy"
+                          style={{ maxHeight: '320px', objectFit: 'contain' }}
                         />
                       </button>
                     </SwiperSlide>
