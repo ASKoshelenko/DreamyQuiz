@@ -1,5 +1,9 @@
 import React, { useState, useCallback } from 'react';
 import { Question, Answer } from '../types';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import 'swiper/css';
+import 'swiper/css/pagination';
+import { Pagination } from 'swiper/modules';
 
 interface QuizProps {
   questions: Question[];
@@ -265,22 +269,30 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload }) => {
 
         {/* Question Images */}
         {currentQuestion.images && currentQuestion.images.length > 0 && (
-          <div className={`mb-6 flex flex-col items-center ${currentQuestion.images.length > 1 ? 'md:grid md:grid-cols-2 gap-4' : ''}`}>
-            {currentQuestion.images.map((imagePath, index) => (
-              <div key={index} className="relative flex justify-center items-center w-full">
-                <button
-                  onClick={() => handleImageClick(imagePath)}
-                  className="w-full max-w-[420px] focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg"
-                >
-                  <img
-                    src={imagePath}
-                    alt={`Question ${currentQuestion.id} - ${index + 1}`}
-                    className="mx-auto w-full h-auto rounded-lg shadow-md cursor-zoom-in hover:opacity-90 transition-opacity object-contain max-h-[320px] bg-white"
-                    loading="lazy"
-                  />
-                </button>
-              </div>
-            ))}
+          <div className="mb-6 w-full flex flex-col items-center">
+            <Swiper
+              spaceBetween={10}
+              slidesPerView={1}
+              pagination={{ clickable: true }}
+              modules={[Pagination]}
+              style={{ maxWidth: 420, width: '100%', margin: '0 auto', marginBottom: 24 }}
+            >
+              {currentQuestion.images.map((imagePath, index) => (
+                <SwiperSlide key={index}>
+                  <button
+                    onClick={() => handleImageClick(imagePath)}
+                    className="w-full focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg"
+                  >
+                    <img
+                      src={imagePath}
+                      alt={`Question ${currentQuestion.id} - ${index + 1}`}
+                      className="mx-auto w-full h-auto rounded-lg shadow-md cursor-zoom-in hover:opacity-90 transition-opacity object-contain max-h-[320px] bg-white"
+                      loading="lazy"
+                    />
+                  </button>
+                </SwiperSlide>
+              ))}
+            </Swiper>
           </div>
         )}
         
