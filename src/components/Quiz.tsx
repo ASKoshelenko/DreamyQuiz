@@ -16,9 +16,10 @@ interface QuizProps {
   setDarkMode: (dark: boolean) => void;
   resetQuiz: () => void;
   onShuffle: () => void;
+  footerRef?: React.RefObject<HTMLElement>;
 }
 
-const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setLanguage, darkMode, setDarkMode, resetQuiz, onShuffle }) => {
+const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setLanguage, darkMode, setDarkMode, resetQuiz, onShuffle, footerRef }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [userAnswers, setUserAnswers] = useState<Record<string, string | string[]>>({});
   const [showResult, setShowResult] = useState(false);
@@ -41,6 +42,37 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
 
   // Флаг для показа модалки статистики после Finish Attempt
   const [showStats, setShowStats] = useState(false);
+
+  // --- Sticky nav buttons logic ---
+  const [navAboveFooter, setNavAboveFooter] = useState(false);
+  const [footerHeight, setFooterHeight] = useState(0);
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' ? window.innerWidth < 640 : false);
+  const navRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!footerRef?.current || !navRef.current) return;
+    const observer = new window.IntersectionObserver(
+      ([entry]) => {
+        setNavAboveFooter(entry.isIntersecting);
+      },
+      {
+        root: null,
+        threshold: 0.01,
+      }
+    );
+    observer.observe(footerRef.current);
+    setFooterHeight(footerRef.current.getBoundingClientRect().height);
+    // Обновляем высоту и isMobile при ресайзе
+    const handleResize = () => {
+      if (footerRef.current) setFooterHeight(footerRef.current.getBoundingClientRect().height);
+      setIsMobile(window.innerWidth < 640);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [footerRef]);
 
   const calculateScore = useCallback(() => {
     const answeredQuestions = Object.keys(userAnswers).length;
@@ -553,30 +585,45 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
 
         {/* Sticky navigation for mobile, centered for desktop */}
         <div className="mt-8 w-full flex flex-col items-center">
-          <div className="fixed bottom-0 left-0 right-0 z-30 bg-gradient-to-t from-white/95 dark:from-gray-900/95 via-white/60 dark:via-gray-900/60 to-transparent px-4 py-4 sm:static sm:bg-none sm:p-0 flex justify-center gap-4 sm:gap-8">
-            <button
-              onClick={handlePrevious}
-              disabled={currentQuestionIndex === 0}
-              className={`flex-1 px-8 py-5 sm:py-4 rounded-xl font-bold text-lg shadow-lg transition-all duration-200 sm:w-auto min-h-[56px] active:scale-95
-                ${currentQuestionIndex === 0
-                  ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-blue-400 to-pink-400 text-white hover:scale-105 hover:shadow-xl'}
-              `}
-            >
-              Previous
-            </button>
-            <button
-              onClick={handleNext}
-              disabled={currentQuestionIndex === totalQuestions - 1}
-              className={`flex-1 px-8 py-5 sm:py-4 rounded-xl font-bold text-lg shadow-lg transition-all duration-200 sm:w-auto min-h-[56px] active:scale-95
-                ${currentQuestionIndex === totalQuestions - 1
-                  ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-pink-400 to-blue-400 text-white hover:scale-105 hover:shadow-xl'}
-              `}
-            >
-              Next
-            </button>
-          </div>
+          <AnimatePresence>
+            {!(isMobile && navAboveFooter) && (
+              <motion.div
+                ref={navRef}
+                className={
+                  `z-30 bg-gradient-to-t from-white/95 dark:from-gray-900/95 via-white/60 dark:via-gray-900/60 to-transparent px-4 py-4 flex justify-center gap-4 sm:gap-8 fixed left-0 right-0 sm:static sm:bg-none sm:p-0`
+                }
+                style={{
+                  bottom: 0
+                }}
+                initial={{ opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0, transition: { duration: 0.22, ease: [0.4,0,0.2,1] } }}
+                exit={{ opacity: 0, y: 24, transition: { duration: 0.18, ease: [0.4,0,0.2,1] } }}
+              >
+                <button
+                  onClick={handlePrevious}
+                  disabled={currentQuestionIndex === 0}
+                  className={`flex-1 px-8 py-5 sm:py-4 rounded-xl font-bold text-lg shadow-lg transition-all duration-200 sm:w-auto min-h-[56px] active:scale-95
+                    ${currentQuestionIndex === 0
+                      ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                      : 'bg-gradient-to-r from-blue-400 to-pink-400 text-white hover:scale-105 hover:shadow-xl'}
+                  `}
+                >
+                  Previous
+                </button>
+                <button
+                  onClick={handleNext}
+                  disabled={currentQuestionIndex === totalQuestions - 1}
+                  className={`flex-1 px-8 py-5 sm:py-4 rounded-xl font-bold text-lg shadow-lg transition-all duration-200 sm:w-auto min-h-[56px] active:scale-95
+                    ${currentQuestionIndex === totalQuestions - 1
+                      ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                      : 'bg-gradient-to-r from-pink-400 to-blue-400 text-white hover:scale-105 hover:shadow-xl'}
+                  `}
+                >
+                  Next
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {renderPagination()}
