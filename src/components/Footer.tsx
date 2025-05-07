@@ -7,14 +7,14 @@ const Footer = React.forwardRef<HTMLElement>((props, ref) => {
   const year = new Date().getFullYear();
   return (
     <footer ref={ref} className="w-full bg-gradient-to-r from-gray-900 via-gray-950 to-gray-900 text-white py-3 px-2">
-      <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs sm:text-base">
-        <div className="text-center sm:text-left font-light">
-          Engineering Tomorrow's Solutions, Today
+      <div className="max-w-7xl mx-auto flex items-center justify-between gap-4 text-xs sm:text-base">
+        <div className="flex-1 flex justify-start">
+          <span className="font-light">Engineering Tomorrow's Solutions, Today</span>
         </div>
-        <div className="text-center font-light">
-          Copyright © {year} DevOpsDive
+        <div className="flex-1 flex justify-center">
+          <span className="font-light text-center">Copyright © {year} DevOpsDive</span>
         </div>
-        <div className="flex items-center justify-center gap-3 mt-2 sm:mt-0">
+        <div className="flex-1 flex justify-end gap-3">
           <a href="mailto:askoshelenko@gmail.com" target="_blank" rel="noopener noreferrer" title="Email" className="hover:text-pink-400 transition-colors text-lg">
             {React.createElement(TbMail as React.ComponentType)}
           </a>
