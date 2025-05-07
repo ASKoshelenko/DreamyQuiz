@@ -4,6 +4,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import { Pagination } from 'swiper/modules';
+import { AnimatePresence, motion } from 'framer-motion';
 
 interface QuizProps {
   questions: Question[];
@@ -272,159 +273,168 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
     <div className="min-h-screen w-full bg-gradient-to-br from-blue-900 via-gray-900 to-pink-900 flex flex-col items-center justify-center transition-colors duration-500">
       <div className="w-full max-w-5xl flex-1 flex flex-col justify-center items-center px-2 sm:px-6 py-8">
         <div ref={questionBlockRef} className="w-full flex flex-col items-center">
-          <div className="w-full rounded-2xl shadow-2xl p-8 sm:p-12 bg-white/10 dark:bg-gray-900/70 backdrop-blur-xl transition-all duration-500 max-w-3xl mx-auto">
-            <div className="mb-6">
-              <div className="text-center mb-2">
-                <span className="text-lg font-semibold text-white">Total Score: {score}%</span>
-              </div>
-              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
-                <div
-                  className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
-                  style={{ width: `${score}%` }}
-                ></div>
-              </div>
-              <div className="flex justify-between items-center mt-2">
-                <div className="text-white font-semibold text-base">
-                  Question {currentQuestionIndex + 1} of {questions.length}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentQuestionIndex}
+              initial={{ opacity: 0, x: 40 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -40 }}
+              transition={{ duration: 0.35, ease: 'easeInOut' }}
+              className="w-full rounded-2xl shadow-2xl p-8 sm:p-12 bg-white/10 dark:bg-gray-900/70 backdrop-blur-xl transition-all duration-500 max-w-3xl mx-auto"
+            >
+              <div className="mb-6">
+                <div className="text-center mb-2">
+                  <span className="text-lg font-semibold text-white">Total Score: {score}%</span>
                 </div>
-                <button
-                  onClick={onShuffle}
-                  className="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full transition-colors duration-200 flex items-center justify-center"
-                  aria-label="Shuffle Questions"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356-2A9 9 0 106.097 19.423M20 9V4h-5" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-
-            {/* Question Images */}
-            {currentQuestion.images && currentQuestion.images.length > 0 && (
-              <div className="mb-6 w-full flex flex-col items-center">
-                <Swiper
-                  spaceBetween={10}
-                  slidesPerView={1}
-                  pagination={{ clickable: true }}
-                  modules={[Pagination]}
-                  className="w-full max-w-3xl"
-                  style={{ margin: '0 auto', marginBottom: 24 }}
-                >
-                  {currentQuestion.images.map((imagePath, index) => (
-                    <SwiperSlide key={index}>
-                      <button
-                        onClick={() => handleImageClick(imagePath)}
-                        className="w-full focus:outline-none focus:ring-2 focus:ring-pink-400 rounded-xl shadow-xl hover:scale-105 transition-transform duration-300 bg-white dark:bg-gray-900"
-                        style={{ display: 'block' }}
-                      >
-                        <img
-                          src={imagePath}
-                          alt={`Question ${currentQuestion.id} - ${index + 1}`}
-                          className="mx-auto w-full h-auto rounded-xl shadow-md cursor-zoom-in hover:opacity-90 transition-opacity object-contain max-h-[320px] bg-white"
-                          loading="lazy"
-                          style={{ maxHeight: '320px', objectFit: 'contain' }}
-                        />
-                      </button>
-                    </SwiperSlide>
-                  ))}
-                </Swiper>
-              </div>
-            )}
-            
-            {/* Modal for enlarged image */}
-            {modalImage && (
-              <div 
-                className="fixed inset-0 bg-black/70 dark:bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-all duration-300"
-                onClick={closeModal}
-              >
-                <div className="bg-white/90 dark:bg-gray-900/90 rounded-2xl shadow-2xl p-4 relative max-w-full max-h-full" onClick={(e) => e.stopPropagation()}>
-                  <img
-                    src={modalImage}
-                    alt="Enlarged view"
-                    className="max-w-full max-h-[90vh] object-contain bg-white dark:bg-gray-900 rounded-xl"
-                  />
-                  <button 
-                    onClick={closeModal}
-                    className="absolute top-2 right-2 bg-white dark:bg-gray-800 rounded-full p-2 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 shadow-lg"
-                    aria-label="Close"
+                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                  <div
+                    className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
+                    style={{ width: `${score}%` }}
+                  ></div>
+                </div>
+                <div className="flex justify-between items-center mt-2">
+                  <div className="text-white font-semibold text-base">
+                    Question {currentQuestionIndex + 1} of {questions.length}
+                  </div>
+                  <button
+                    onClick={onShuffle}
+                    className="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full transition-colors duration-200 flex items-center justify-center"
+                    aria-label="Shuffle Questions"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356-2A9 9 0 106.097 19.423M20 9V4h-5" />
                     </svg>
                   </button>
                 </div>
               </div>
-            )}
-            
-            <div className="prose max-w-none dark:prose-invert text-gray-900 dark:text-white">
-              <div className="bg-gray-50/80 dark:bg-gray-800/80 p-4 sm:p-6 rounded-xl mb-6 transition-colors duration-300 shadow-sm">
-                <p className="text-lg dark:text-white">
-                  {language === 'en' ? currentQuestion.text : (currentQuestion.textRu || currentQuestion.text)}
-                </p>
-                {currentQuestion.isMultipleChoice && (
-                  <p className="text-sm text-pink-600 mt-2 italic font-semibold">
-                    Select all that apply
-                  </p>
-                )}
-              </div>
 
-              {currentQuestion.isInformational ? (
-                <div className="bg-blue-50 dark:bg-blue-900 p-4 rounded-lg">
-                  <p className="text-blue-700 dark:text-blue-200">This is an informational question. Read and understand the content.</p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {currentQuestion.answers.map((answer: Answer) => {
-                    const isSelected = currentQuestion.isMultipleChoice
-                      ? (userAnswers[currentQuestion.id] as string[] || []).includes(answer.label)
-                      : userAnswers[currentQuestion.id] === answer.label;
-                    const isCorrect = currentQuestion.isMultipleChoice
-                      ? (currentQuestion.correctAnswer as string[] || []).includes(answer.label)
-                      : currentQuestion.correctAnswer === answer.label;
-                    return (
-                      <button
-                        key={answer.label}
-                        onClick={() => handleAnswer(answer.label)}
-                        disabled={showResult && !currentQuestion.isMultipleChoice}
-                        className={`w-full text-left p-4 sm:p-5 rounded-xl border-2 font-semibold text-lg shadow-sm transition-all duration-200
-                        ${showResult
-                          ? isCorrect
-                            ? 'bg-green-500 border-green-600 text-white font-bold shadow-lg'
-                            : isSelected
-                            ? 'bg-pink-500 border-pink-600 text-white font-bold shadow-lg'
-                            : 'border-gray-200 text-gray-600 bg-white dark:bg-transparent'
-                          : isSelected
-                          ? 'bg-blue-600 border-blue-700 text-white font-bold scale-105 shadow-lg'
-                          : 'border-gray-200 text-gray-900 dark:text-white bg-white dark:bg-transparent hover:bg-pink-100 dark:hover:bg-gradient-to-r dark:hover:from-blue-500 dark:hover:to-pink-500 hover:text-blue-900 dark:hover:text-white hover:font-bold'}
-                        `}
-                      >
-                        <div className="flex items-center">
-                          <span className="font-bold mr-3 text-xl">{answer.label}.</span>
-                          <span className="text-base sm:text-lg">{answer.text}</span>
-                        </div>
-                      </button>
-                    );
-                  })}
-                  
-                  {currentQuestion.isMultipleChoice && !showResult && (
-                    <div className="mt-4 flex justify-center">
-                      <button
-                        onClick={handleSubmitMultipleChoice}
-                        disabled={!(userAnswers[currentQuestion.id] as string[] || []).length}
-                        className={`px-8 py-3 rounded-full text-white font-bold shadow-lg text-lg transition-all duration-200
-                          ${(userAnswers[currentQuestion.id] as string[] || []).length
-                            ? 'bg-gradient-to-r from-blue-500 to-pink-500 hover:scale-105 hover:shadow-xl'
-                            : 'bg-gray-400 cursor-not-allowed'}
-                        `}
-                      >
-                        Submit
-                      </button>
-                    </div>
-                  )}
+              {/* Question Images */}
+              {currentQuestion.images && currentQuestion.images.length > 0 && (
+                <div className="mb-6 w-full flex flex-col items-center">
+                  <Swiper
+                    spaceBetween={10}
+                    slidesPerView={1}
+                    pagination={{ clickable: true }}
+                    modules={[Pagination]}
+                    className="w-full max-w-3xl"
+                    style={{ margin: '0 auto', marginBottom: 24 }}
+                  >
+                    {currentQuestion.images.map((imagePath, index) => (
+                      <SwiperSlide key={index}>
+                        <button
+                          onClick={() => handleImageClick(imagePath)}
+                          className="w-full focus:outline-none focus:ring-2 focus:ring-pink-400 rounded-xl shadow-xl hover:scale-105 transition-transform duration-300 bg-white dark:bg-gray-900"
+                          style={{ display: 'block' }}
+                        >
+                          <img
+                            src={imagePath}
+                            alt={`Question ${currentQuestion.id} - ${index + 1}`}
+                            className="mx-auto w-full h-auto rounded-xl shadow-md cursor-zoom-in hover:opacity-90 transition-opacity object-contain max-h-[320px] bg-white"
+                            loading="lazy"
+                            style={{ maxHeight: '320px', objectFit: 'contain' }}
+                          />
+                        </button>
+                      </SwiperSlide>
+                    ))}
+                  </Swiper>
                 </div>
               )}
-            </div>
-          </div>
+              
+              {/* Modal for enlarged image */}
+              {modalImage && (
+                <div 
+                  className="fixed inset-0 bg-black/70 dark:bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 transition-all duration-300"
+                  onClick={closeModal}
+                >
+                  <div className="bg-white/90 dark:bg-gray-900/90 rounded-2xl shadow-2xl p-4 relative max-w-full max-h-full" onClick={(e) => e.stopPropagation()}>
+                    <img
+                      src={modalImage}
+                      alt="Enlarged view"
+                      className="max-w-full max-h-[90vh] object-contain bg-white dark:bg-gray-900 rounded-xl"
+                    />
+                    <button 
+                      onClick={closeModal}
+                      className="absolute top-2 right-2 bg-white dark:bg-gray-800 rounded-full p-2 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 shadow-lg"
+                      aria-label="Close"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              )}
+              
+              <div className="prose max-w-none dark:prose-invert text-gray-900 dark:text-white">
+                <div className="bg-gray-50/80 dark:bg-gray-800/80 p-4 sm:p-6 rounded-xl mb-6 transition-colors duration-300 shadow-sm">
+                  <p className="text-lg dark:text-white">
+                    {language === 'en' ? currentQuestion.text : (currentQuestion.textRu || currentQuestion.text)}
+                  </p>
+                  {currentQuestion.isMultipleChoice && (
+                    <p className="text-sm text-pink-600 mt-2 italic font-semibold">
+                      Select all that apply
+                    </p>
+                  )}
+                </div>
+
+                {currentQuestion.isInformational ? (
+                  <div className="bg-blue-50 dark:bg-blue-900 p-4 rounded-lg">
+                    <p className="text-blue-700 dark:text-blue-200">This is an informational question. Read and understand the content.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {currentQuestion.answers.map((answer: Answer) => {
+                      const isSelected = currentQuestion.isMultipleChoice
+                        ? (userAnswers[currentQuestion.id] as string[] || []).includes(answer.label)
+                        : userAnswers[currentQuestion.id] === answer.label;
+                      const isCorrect = currentQuestion.isMultipleChoice
+                        ? (currentQuestion.correctAnswer as string[] || []).includes(answer.label)
+                        : currentQuestion.correctAnswer === answer.label;
+                      return (
+                        <button
+                          key={answer.label}
+                          onClick={() => handleAnswer(answer.label)}
+                          disabled={showResult && !currentQuestion.isMultipleChoice}
+                          className={`w-full text-left p-4 sm:p-5 rounded-xl border-2 font-semibold text-lg shadow-sm transition-all duration-200
+                          ${showResult
+                            ? isCorrect
+                              ? 'bg-green-500 border-green-600 text-white font-bold shadow-lg'
+                              : isSelected
+                              ? 'bg-pink-500 border-pink-600 text-white font-bold shadow-lg'
+                              : 'border-gray-200 text-gray-600 bg-white dark:bg-transparent'
+                            : isSelected
+                            ? 'bg-blue-600 border-blue-700 text-white font-bold scale-105 shadow-lg'
+                            : 'border-gray-200 text-gray-900 dark:text-white bg-white dark:bg-transparent hover:bg-pink-100 dark:hover:bg-gradient-to-r dark:hover:from-blue-500 dark:hover:to-pink-500 hover:text-blue-900 dark:hover:text-white hover:font-bold'}
+                          `}
+                        >
+                          <div className="flex items-center">
+                            <span className="font-bold mr-3 text-xl">{answer.label}.</span>
+                            <span className="text-base sm:text-lg">{answer.text}</span>
+                          </div>
+                        </button>
+                      );
+                    })}
+                    
+                    {currentQuestion.isMultipleChoice && !showResult && (
+                      <div className="mt-4 flex justify-center">
+                        <button
+                          onClick={handleSubmitMultipleChoice}
+                          disabled={!(userAnswers[currentQuestion.id] as string[] || []).length}
+                          className={`px-8 py-3 rounded-full text-white font-bold shadow-lg text-lg transition-all duration-200
+                            ${(userAnswers[currentQuestion.id] as string[] || []).length
+                              ? 'bg-gradient-to-r from-blue-500 to-pink-500 hover:scale-105 hover:shadow-xl'
+                              : 'bg-gray-400 cursor-not-allowed'}
+                          `}
+                        >
+                          Submit
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </AnimatePresence>
         </div>
 
         {/* Sticky navigation for mobile, centered for desktop */}
