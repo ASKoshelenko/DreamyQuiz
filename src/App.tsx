@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import FileUpload from './components/FileUpload';
 import Quiz from './components/Quiz';
 import QuizSelector from './components/QuizSelector';
 import { Question, parseQuestions } from './utils/questionParser';
 import MinimalHeader from './components/MinimalHeader';
 import { shuffleArray } from './utils/shuffle';
+import Footer from './components/Footer';
 import './App.css';
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
     }
     return false;
   });
+  const footerRef = useRef<HTMLElement>(null);
 
   const handleFileUpload = (content: string, fileName: string) => {
     const parsedQuestions = parseQuestions(content);
@@ -48,7 +50,7 @@ function App() {
   };
 
   return (
-    <div className="app-container">
+    <div className="min-h-screen flex flex-col">
       <MinimalHeader
         language={language}
         setLanguage={setLanguage}
@@ -56,7 +58,7 @@ function App() {
         setDarkMode={setDarkMode}
         onReset={isFileUploaded ? handleReturnToUpload : undefined}
       />
-      <main className="app-content">
+      <main className="flex-1 app-content">
         {showQuizSelector ? (
           <QuizSelector 
             onSelectQuiz={handleQuizSelect} 
@@ -74,9 +76,11 @@ function App() {
             setDarkMode={setDarkMode}
             resetQuiz={handleReturnToUpload}
             onShuffle={handleShuffleQuestions}
+            footerRef={footerRef}
           />
         )}
       </main>
+      <Footer ref={footerRef} />
     </div>
   );
 }
