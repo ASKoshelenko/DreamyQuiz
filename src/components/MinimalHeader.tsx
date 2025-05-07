@@ -6,19 +6,62 @@ interface MinimalHeaderProps {
   darkMode: boolean;
   setDarkMode: (dark: boolean) => void;
   onReset?: () => void;
+  onShowHistory?: () => void;
+  onShuffle?: () => void;
+  onFinishAttempt?: () => void;
+  disableFinish?: boolean;
 }
 
-const MinimalHeader: React.FC<MinimalHeaderProps> = ({ language, setLanguage, darkMode, setDarkMode, onReset }) => {
+const MinimalHeader: React.FC<MinimalHeaderProps> = ({ language, setLanguage, darkMode, setDarkMode, onReset, onShowHistory, onShuffle, onFinishAttempt, disableFinish }) => {
   return (
     <header className="fixed top-0 left-0 w-full z-40 bg-white/60 dark:bg-gray-900/60 backdrop-blur-md shadow-sm px-4 py-2">
       <div className="flex flex-col sm:flex-row items-center justify-between gap-2 w-full">
         <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white select-none mb-1 sm:mb-0">Dreamy Quiz</h1>
         <div className="flex items-center gap-2">
+          {/* Иконка Shuffle */}
+          {onShuffle && (
+            <button
+              onClick={onShuffle}
+              className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-blue-100 dark:hover:bg-blue-800 transition-colors"
+              title="Shuffle Questions"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356-2A9 9 0 106.097 19.423M20 9V4h-5" />
+              </svg>
+            </button>
+          )}
+          {/* Иконка History */}
+          {onShowHistory && (
+            <button
+              onClick={onShowHistory}
+              className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-blue-100 dark:hover:bg-blue-800 transition-colors"
+              title="History"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600 dark:text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </button>
+          )}
+          {/* Иконка Finish Attempt */}
+          {onFinishAttempt && (
+            <button
+              onClick={onFinishAttempt}
+              className="p-2 rounded-full bg-gradient-to-r from-pink-500 to-blue-500 hover:scale-110 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-pink-400 text-white flex items-center justify-center transition-all duration-200 disabled:opacity-50"
+              disabled={disableFinish}
+              title="Finish Attempt"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a5 5 0 00-10 0v2a2 2 0 00-2 2v7a2 2 0 002 2h10a2 2 0 002-2v-7a2 2 0 00-2-2z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 17v.01" />
+              </svg>
+            </button>
+          )}
           {onReset && (
             <button
               onClick={onReset}
               className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-blue-100 dark:hover:bg-blue-800 transition-colors"
               aria-label="Start Over"
+              title="Start Over"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600 dark:text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />

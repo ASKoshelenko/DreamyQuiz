@@ -5,6 +5,7 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 import { Pagination } from 'swiper/modules';
 import { AnimatePresence, motion } from 'framer-motion';
+import MinimalHeader from './MinimalHeader';
 
 interface QuizProps {
   questions: Question[];
@@ -27,6 +28,43 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
   const [showScrollTop, setShowScrollTop] = useState(false);
   const questionBlockRef = useRef<HTMLDivElement>(null);
 
+  // Ключ для localStorage (можно доработать для уникальности по quizId)
+  const storageKey = `quiz-progress-${questions.length}`;
+
+  // Ключ для истории
+  const historyKey = `quiz-history-${questions.length}`;
+  const [showHistory, setShowHistory] = useState(false);
+  const [history, setHistory] = useState<any[]>([]);
+
+  // Флаг для ручного завершения попытки
+  const [finished, setFinished] = useState(false);
+
+  // Флаг для показа модалки статистики после Finish Attempt
+  const [showStats, setShowStats] = useState(false);
+
+  const calculateScore = useCallback(() => {
+    const answeredQuestions = Object.keys(userAnswers).length;
+    if (answeredQuestions === 0) return 0;
+
+    let correctAnswers = 0;
+    Object.entries(userAnswers).forEach(([id, answer]) => {
+      const question = questions.find(q => q.id === id);
+      if (!question) return;
+      if (question.isMultipleChoice) {
+        const userAnswerArray = answer as string[];
+        const correctAnswerArray = question.correctAnswer as string[];
+        if (userAnswerArray.length === correctAnswerArray.length && userAnswerArray.every(a => correctAnswerArray.includes(a))) {
+          correctAnswers++;
+        }
+      } else {
+        if (question.correctAnswer === answer) {
+          correctAnswers++;
+        }
+      }
+    });
+    return Math.round((correctAnswers / answeredQuestions) * 100);
+  }, [userAnswers, questions]);
+
   useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add('dark');
@@ -44,6 +82,66 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Восстановление прогресса при загрузке
+  useEffect(() => {
+    const saved = localStorage.getItem(storageKey);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed && typeof parsed === 'object') {
+          if (parsed.userAnswers) setUserAnswers(parsed.userAnswers);
+          if (typeof parsed.currentQuestionIndex === 'number') setCurrentQuestionIndex(parsed.currentQuestionIndex);
+        }
+      } catch {}
+    }
+    // eslint-disable-next-line
+  }, [storageKey]);
+
+  // Сохраняем прогресс при изменениях
+  useEffect(() => {
+    localStorage.setItem(storageKey, JSON.stringify({ userAnswers, currentQuestionIndex }));
+  }, [userAnswers, currentQuestionIndex, storageKey]);
+
+  // Загрузка истории при монтировании
+  useEffect(() => {
+    const saved = localStorage.getItem(historyKey);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) setHistory(parsed);
+      } catch {}
+    }
+    // eslint-disable-next-line
+  }, [historyKey]);
+
+  // Сохраняем попытку в историю при ручном завершении или полном прохождении
+  useEffect(() => {
+    const allAnswered = questions.length > 0 && questions.every(q => userAnswers[q.id]);
+    if ((allAnswered || finished) && Object.keys(userAnswers).length > 0) {
+      const score = calculateScore();
+      const attempt = {
+        date: new Date().toISOString(),
+        score,
+        total: questions.length,
+        correct: Math.round((score / 100) * questions.length),
+        answers: userAnswers,
+        partial: !allAnswered,
+      };
+      const updated = [attempt, ...history].slice(0, 20); // максимум 20 попыток
+      setHistory(updated);
+      localStorage.setItem(historyKey, JSON.stringify(updated));
+      setFinished(false); // сбрасываем флаг после сохранения
+    }
+    // eslint-disable-next-line
+  }, [userAnswers, questions, calculateScore, finished]);
+
+  // Показываем статистику после ручного завершения попытки
+  useEffect(() => {
+    if (finished) {
+      setShowStats(true);
+    }
+  }, [finished]);
 
   const handleAnswer = useCallback((answer: string) => {
     const currentQuestion = questions[currentQuestionIndex];
@@ -92,36 +190,6 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
       setShowResult(false);
     }
   }, [currentQuestionIndex]);
-
-  const calculateScore = useCallback(() => {
-    const answeredQuestions = Object.keys(userAnswers).length;
-    if (answeredQuestions === 0) return 0;
-
-    let correctAnswers = 0;
-    
-    Object.entries(userAnswers).forEach(([id, answer]) => {
-      const question = questions.find(q => q.id === id);
-      if (!question) return;
-      
-      if (question.isMultipleChoice) {
-        // For multiple choice, all correct answers must be selected and no incorrect ones
-        const userAnswerArray = answer as string[];
-        const correctAnswerArray = question.correctAnswer as string[];
-        
-        if (userAnswerArray.length === correctAnswerArray.length && 
-            userAnswerArray.every(a => correctAnswerArray.includes(a))) {
-          correctAnswers++;
-        }
-      } else {
-        // For single choice, just check if the answer matches
-        if (question.correctAnswer === answer) {
-          correctAnswers++;
-        }
-      }
-    });
-
-    return Math.round((correctAnswers / answeredQuestions) * 100);
-  }, [userAnswers, questions]);
 
   const handleImageClick = useCallback((imagePath: string) => {
     setModalImage(imagePath);
@@ -197,6 +265,26 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
   const totalQuestions = questions.length;
   const totalPages = Math.ceil(totalQuestions / pageSize);
   const score = calculateScore();
+
+  // Вычисляем количество правильных и процент среди отвеченных
+  const answeredCount = Object.keys(userAnswers).length;
+  let correctCount = 0;
+  Object.entries(userAnswers).forEach(([id, answer]) => {
+    const question = questions.find(q => q.id === id);
+    if (!question) return;
+    if (question.isMultipleChoice) {
+      const userAnswerArray = answer as string[];
+      const correctAnswerArray = question.correctAnswer as string[];
+      if (userAnswerArray.length === correctAnswerArray.length && userAnswerArray.every(a => correctAnswerArray.includes(a))) {
+        correctCount++;
+      }
+    } else {
+      if (question.correctAnswer === answer) {
+        correctCount++;
+      }
+    }
+  });
+  const scorePercent = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
 
   const goToPage = (page: number) => {
     if (page >= 1 && page <= totalPages) {
@@ -278,6 +366,17 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
 
   return (
     <div className="min-h-screen w-full bg-gradient-to-br from-blue-900 via-gray-900 to-pink-900 flex flex-col items-center justify-center transition-colors duration-500">
+      <MinimalHeader
+        language={language}
+        setLanguage={setLanguage}
+        darkMode={darkMode}
+        setDarkMode={setDarkMode}
+        onReset={onReturnToUpload}
+        onShowHistory={() => setShowHistory(true)}
+        onShuffle={onShuffle}
+        onFinishAttempt={() => setFinished(true)}
+        disableFinish={Object.keys(userAnswers).length === 0}
+      />
       <div className="w-full max-w-5xl flex-1 flex flex-col justify-center items-center px-2 sm:px-6 py-8">
         <div ref={questionBlockRef} className="w-full flex flex-col items-center">
           <AnimatePresence mode="wait">
@@ -300,7 +399,7 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
                   ></div>
                 </div>
                 {/* Stepper progress bar */}
-                <div className="w-full flex items-center justify-center mt-4 mb-2">
+                <div className="w-full flex flex-col items-center justify-center mt-4 mb-2 relative">
                   <div className="flex gap-1 sm:gap-2 w-full max-w-xl">
                     {questions.map((_, idx) => (
                       <div
@@ -310,23 +409,16 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
                       ></div>
                     ))}
                   </div>
-                  <span className="ml-3 text-xs sm:text-sm text-white font-semibold">
+                  {/* Счетчик вопросов: на мобильных в одну строку и под прогресс-баром */}
+                  <span className="block text-xs sm:hidden text-white font-semibold mt-2 text-center">
+                    {currentQuestionIndex + 1} / {questions.length}
+                  </span>
+                  <span className="ml-3 text-xs sm:text-sm text-white font-semibold hidden sm:inline-block">
                     {currentQuestionIndex + 1} / {questions.length}
                   </span>
                 </div>
                 <div className="flex justify-between items-center mt-2">
-                  <div className="text-white font-semibold text-base">
-                    Question {currentQuestionIndex + 1} of {questions.length}
-                  </div>
-                  <button
-                    onClick={onShuffle}
-                    className="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full transition-colors duration-200 flex items-center justify-center"
-                    aria-label="Shuffle Questions"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356-2A9 9 0 106.097 19.423M20 9V4h-5" />
-                    </svg>
-                  </button>
+                  {/* Удаляю Question 1 of 553 */}
                 </div>
               </div>
 
@@ -515,6 +607,20 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
             ))}
           </div>
         </div>
+
+        {/* Модалка статистики после Finish Attempt */}
+        {showStats && (
+          <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center">
+            <div className="bg-white dark:bg-gray-900 rounded-xl p-8 max-w-md w-full shadow-2xl relative flex flex-col items-center">
+              <button onClick={() => setShowStats(false)} className="absolute top-2 right-2 p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-blue-200">✕</button>
+              <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Attempt Statistics</h2>
+              <div className="text-lg text-gray-900 dark:text-white mb-2">Answered: <span className="font-bold text-blue-600">{answeredCount}</span> / {questions.length}</div>
+              <div className="text-lg text-gray-900 dark:text-white mb-2">Correct: <span className="font-bold text-pink-500">{correctCount} / {answeredCount}</span></div>
+              <div className="text-lg text-gray-900 dark:text-white mb-2">Score: <span className="font-bold text-pink-500">{scorePercent}%</span></div>
+              <button onClick={() => setShowStats(false)} className="mt-6 px-6 py-2 rounded bg-blue-500 hover:bg-blue-600 text-white font-semibold">Close</button>
+            </div>
+          </div>
+        )}
       </div>
       {/* Scroll to top button */}
       {showScrollTop && (
@@ -528,6 +634,37 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
           </svg>
         </button>
+      )}
+      {/* Модалка истории */}
+      {showHistory && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center">
+          <div className="bg-white dark:bg-gray-900 rounded-xl p-6 max-w-lg w-full shadow-2xl relative">
+            <button onClick={() => setShowHistory(false)} className="absolute top-2 right-2 p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-blue-200">✕</button>
+            <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">Quiz History</h2>
+            <table className="w-full text-sm mb-4">
+              <thead><tr>
+                <th className="text-white">Date</th>
+                <th className="text-white">Score</th>
+                <th className="text-white">Correct</th>
+                <th className="text-white">Status</th>
+              </tr></thead>
+              <tbody>
+                {history.length === 0 && (
+                  <tr><td colSpan={4} className="text-center text-gray-400 py-4">No attempts yet</td></tr>
+                )}
+                {history.map((h, i) => (
+                  <tr key={i} className="border-b border-gray-200 dark:border-gray-700">
+                    <td>{new Date(h.date).toLocaleString()}</td>
+                    <td>{h.score}%</td>
+                    <td>{h.correct}/{h.total}</td>
+                    <td>{h.partial ? <span className="text-pink-500 font-semibold">Partial</span> : <span className="text-blue-600 font-semibold">Full</span>}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <button onClick={() => { setHistory([]); localStorage.removeItem(historyKey); }} className="px-4 py-2 rounded bg-pink-500 hover:bg-pink-600 text-white font-semibold">Clear History</button>
+          </div>
+        </div>
       )}
     </div>
   );
