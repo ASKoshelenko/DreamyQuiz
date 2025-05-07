@@ -152,15 +152,22 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
     }
   };
 
-  // Горячие клавиши: A/B/C/D, стрелки, Enter
+  // Горячие клавиши: A-Z, 1-9, стрелки, Enter
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (modalImage) return; // Не реагировать, если открыта модалка
-      if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName)) return;
+      if (["INPUT", "TEXTAREA"].includes((e.target as HTMLElement)?.tagName)) return;
       const answers = questions[currentQuestionIndex].answers;
-      // A/B/C/D
-      if (/^[a-dA-D]$/.test(e.key)) {
+      // A-Z
+      if (/^[a-zA-Z]$/.test(e.key)) {
         const idx = e.key.toUpperCase().charCodeAt(0) - 65;
+        if (answers[idx]) {
+          handleAnswer(answers[idx].label);
+        }
+      }
+      // 1-9
+      if (/^[1-9]$/.test(e.key)) {
+        const idx = parseInt(e.key, 10) - 1;
         if (answers[idx]) {
           handleAnswer(answers[idx].label);
         }
