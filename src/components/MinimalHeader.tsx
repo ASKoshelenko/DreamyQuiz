@@ -25,6 +25,7 @@ const MinimalHeader: React.FC<MinimalHeaderProps> = ({ language, setLanguage, da
               </svg>
             </button>
           )}
+          {/* Temporarily commented out language switcher
           <button
             onClick={() => setLanguage('en')}
             className={`p-2 rounded-full ${language === 'en' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-blue-100 dark:hover:bg-blue-800'}`}
@@ -35,6 +36,7 @@ const MinimalHeader: React.FC<MinimalHeaderProps> = ({ language, setLanguage, da
             className={`p-2 rounded-full ${language === 'ru' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-blue-100 dark:hover:bg-blue-800'}`}
             aria-label="Russian"
           >RU</button>
+          */}
           <button
             onClick={() => setDarkMode(!darkMode)}
             className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"

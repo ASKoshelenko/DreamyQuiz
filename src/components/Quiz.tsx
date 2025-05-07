@@ -246,7 +246,7 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
           <div className="w-full rounded-2xl shadow-2xl p-8 sm:p-12 bg-white/10 dark:bg-gray-900/70 backdrop-blur-xl transition-all duration-500 max-w-3xl mx-auto">
             <div className="mb-6">
               <div className="text-center mb-2">
-                <span className="text-lg font-semibold text-gray-900 dark:text-white">Total Score: {score}%</span>
+                <span className="text-lg font-semibold text-white">Total Score: {score}%</span>
               </div>
               <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
                 <div
@@ -255,7 +255,7 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
                 ></div>
               </div>
               <div className="flex justify-between items-center mt-2">
-                <div className="text-gray-700 dark:text-gray-200 font-semibold text-base">
+                <div className="text-white font-semibold text-base">
                   Question {currentQuestionIndex + 1} of {questions.length}
                 </div>
                 <button
@@ -363,10 +363,10 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
                             ? 'bg-green-500 border-green-600 text-white font-bold shadow-lg'
                             : isSelected
                             ? 'bg-pink-500 border-pink-600 text-white font-bold shadow-lg'
-                            : 'border-gray-200 text-gray-600'
+                            : 'border-gray-200 text-gray-600 bg-white dark:bg-transparent'
                           : isSelected
                           ? 'bg-blue-600 border-blue-700 text-white font-bold scale-105 shadow-lg'
-                          : 'border-gray-200 text-gray-900 dark:text-white hover:bg-gradient-to-r hover:from-blue-500 hover:to-pink-500 hover:text-white hover:font-bold'}
+                          : 'border-gray-200 text-gray-900 dark:text-white bg-white dark:bg-transparent hover:bg-pink-100 dark:hover:bg-gradient-to-r dark:hover:from-blue-500 dark:hover:to-pink-500 hover:text-blue-900 dark:hover:text-white hover:font-bold'}
                         `}
                       >
                         <div className="flex items-center">

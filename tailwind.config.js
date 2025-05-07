@@ -1,5 +1,5 @@
 module.exports = {
-  darkMode: 'media', // Enable dark mode based on user's OS preference
+  darkMode: 'class', // Enable dark mode based on class
   content: [
     "./src/**/*.{js,jsx,ts,tsx}",
   ],
