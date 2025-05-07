@@ -16,7 +16,7 @@ const MinimalHeader: React.FC<MinimalHeaderProps> = ({ language, setLanguage, da
   return (
     <header className="fixed top-0 left-0 w-full z-40 bg-white/60 dark:bg-gray-900/60 backdrop-blur-md shadow-sm px-4 py-2">
       <div className="flex flex-col sm:flex-row items-center justify-between gap-2 w-full">
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white select-none mb-1 sm:mb-0">Dreamy Quiz</h1>
+        <h1 className="text-xl sm:text-2xl font-bold select-none mb-1 sm:mb-0 bg-gradient-to-r from-pink-500 to-blue-500 bg-clip-text text-transparent">Dreamy Quiz</h1>
         <div className="flex items-center gap-2">
           {/* Иконка Shuffle */}
           {onShuffle && (
