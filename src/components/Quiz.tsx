@@ -45,7 +45,6 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
 
   // --- Sticky nav buttons logic ---
   const [navAboveFooter, setNavAboveFooter] = useState(false);
-  const [footerHeight, setFooterHeight] = useState(0);
   const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' ? window.innerWidth < 640 : false);
   const navRef = useRef<HTMLDivElement>(null);
 
@@ -61,10 +60,8 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
       }
     );
     observer.observe(footerRef.current);
-    setFooterHeight(footerRef.current.getBoundingClientRect().height);
-    // Обновляем высоту и isMobile при ресайзе
+    // Обновляем isMobile при ресайзе
     const handleResize = () => {
-      if (footerRef.current) setFooterHeight(footerRef.current.getBoundingClientRect().height);
       setIsMobile(window.innerWidth < 640);
     };
     window.addEventListener('resize', handleResize);
