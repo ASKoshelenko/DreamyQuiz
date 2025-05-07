@@ -292,6 +292,21 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
                     style={{ width: `${score}%` }}
                   ></div>
                 </div>
+                {/* Stepper progress bar */}
+                <div className="w-full flex items-center justify-center mt-4 mb-2">
+                  <div className="flex gap-1 sm:gap-2 w-full max-w-xl">
+                    {questions.map((_, idx) => (
+                      <div
+                        key={idx}
+                        className={`flex-1 h-2 rounded-full transition-all duration-300
+                          ${idx < currentQuestionIndex ? 'bg-blue-400 dark:bg-blue-700' : idx === currentQuestionIndex ? 'bg-pink-400 dark:bg-pink-600' : 'bg-gray-300 dark:bg-gray-800'}`}
+                      ></div>
+                    ))}
+                  </div>
+                  <span className="ml-3 text-xs sm:text-sm text-white font-semibold">
+                    {currentQuestionIndex + 1} / {questions.length}
+                  </span>
+                </div>
                 <div className="flex justify-between items-center mt-2">
                   <div className="text-white font-semibold text-base">
                     Question {currentQuestionIndex + 1} of {questions.length}
@@ -395,7 +410,7 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
                           key={answer.label}
                           onClick={() => handleAnswer(answer.label)}
                           disabled={showResult && !currentQuestion.isMultipleChoice}
-                          className={`w-full text-left p-4 sm:p-5 rounded-xl border-2 font-semibold text-lg shadow-sm transition-all duration-200
+                          className={`w-full text-left p-4 sm:p-5 rounded-xl border-2 font-semibold text-lg shadow-sm transition-all duration-200 min-h-[56px] sm:min-h-[64px] active:scale-95
                           ${showResult
                             ? isCorrect
                               ? 'bg-green-500 border-green-600 text-white font-bold shadow-lg'
@@ -443,7 +458,7 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
             <button
               onClick={handlePrevious}
               disabled={currentQuestionIndex === 0}
-              className={`flex-1 px-8 py-4 rounded-xl font-bold text-lg shadow-lg transition-all duration-200 sm:w-auto
+              className={`flex-1 px-8 py-5 sm:py-4 rounded-xl font-bold text-lg shadow-lg transition-all duration-200 sm:w-auto min-h-[56px] active:scale-95
                 ${currentQuestionIndex === 0
                   ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
                   : 'bg-gradient-to-r from-blue-400 to-pink-400 text-white hover:scale-105 hover:shadow-xl'}
@@ -454,7 +469,7 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
             <button
               onClick={handleNext}
               disabled={currentQuestionIndex === totalQuestions - 1}
-              className={`flex-1 px-8 py-4 rounded-xl font-bold text-lg shadow-lg transition-all duration-200 sm:w-auto
+              className={`flex-1 px-8 py-5 sm:py-4 rounded-xl font-bold text-lg shadow-lg transition-all duration-200 sm:w-auto min-h-[56px] active:scale-95
                 ${currentQuestionIndex === totalQuestions - 1
                   ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
                   : 'bg-gradient-to-r from-pink-400 to-blue-400 text-white hover:scale-105 hover:shadow-xl'}
