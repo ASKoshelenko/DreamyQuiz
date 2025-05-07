@@ -151,6 +151,35 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
     }
   };
 
+  // Горячие клавиши: A/B/C/D, стрелки, Enter
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (modalImage) return; // Не реагировать, если открыта модалка
+      if (['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName)) return;
+      const answers = questions[currentQuestionIndex].answers;
+      // A/B/C/D
+      if (/^[a-dA-D]$/.test(e.key)) {
+        const idx = e.key.toUpperCase().charCodeAt(0) - 65;
+        if (answers[idx]) {
+          handleAnswer(answers[idx].label);
+        }
+      }
+      // Стрелки
+      if (e.key === 'ArrowRight') {
+        handleNext();
+      }
+      if (e.key === 'ArrowLeft') {
+        handlePrevious();
+      }
+      // Enter для мультивыбора
+      if (e.key === 'Enter' && questions[currentQuestionIndex].isMultipleChoice && !showResult) {
+        handleSubmitMultipleChoice();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentQuestionIndex, handleAnswer, handleNext, handlePrevious, handleSubmitMultipleChoice, modalImage, showResult, questions]);
+
   // Guard clause for empty questions array
   if (!questions || questions.length === 0) {
     return <div className="quiz-container">No questions available.</div>;
