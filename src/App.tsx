@@ -76,13 +76,17 @@ function App() {
           <QuizSelector 
             onSelectQuiz={handleQuizSelect} 
             onUploadFile={() => setShowQuizSelector(false)} 
+            darkMode={darkMode}
+            setDarkMode={setDarkMode}
           />
         ) : !isFileUploaded ? (
           <FileUpload onFileUpload={handleFileUpload} />
         ) : showModeSelector ? (
           <ModeSelector 
             onSelectMode={handleModeSelect} 
-            language={language} 
+            language={language}
+            darkMode={darkMode}
+            setDarkMode={setDarkMode}
           />
         ) : (
           <Quiz 
