@@ -81,7 +81,7 @@ function App() {
         isLearnMode={quizMode === 'learn'}
         onToggleMode={!showQuizSelector && !showModeSelector && quizMode ? handleToggleMode : undefined}
       />
-      <main className="flex-1 app-content">
+      <main className="flex-1 app-content pt-16">
         {showQuizSelector ? (
           <QuizSelector 
             onSelectQuiz={handleQuizSelect} 

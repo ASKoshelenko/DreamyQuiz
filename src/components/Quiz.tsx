@@ -430,7 +430,7 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
         disableFinish={Object.keys(userAnswers).length === 0}
         isLearnMode={isLearnMode}
       />
-      <div className="w-full max-w-5xl flex-1 flex flex-col justify-center items-center px-2 sm:px-6 py-8">
+      <div className="w-full max-w-5xl flex-1 flex flex-col justify-center items-center px-2 sm:px-6 py-8 mt-14">
         <div ref={questionBlockRef} className="w-full flex flex-col items-center">
           <AnimatePresence mode="wait">
             <motion.div
@@ -442,13 +442,6 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
               className="w-full rounded-2xl shadow-2xl p-8 sm:p-12 bg-white/10 dark:bg-gray-900/70 backdrop-blur-xl transition-all duration-500 max-w-3xl mx-auto"
             >
               <div className="mb-6">
-                {isLearnMode && (
-                  <div className="text-center mb-4">
-                    <span className="inline-block px-4 py-2 bg-green-500 text-white font-bold rounded-full">
-                      {language === 'en' ? 'Learn Mode' : 'Режим обучения'}
-                    </span>
-                  </div>
-                )}
                 <div className="text-center mb-2">
                   <span className="text-lg font-semibold text-white">
                     {!isLearnMode ? `${language === 'en' ? 'Total Score' : 'Общий счет'}: ${score}%` : ''}
