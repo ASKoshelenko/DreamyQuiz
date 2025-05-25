@@ -11,10 +11,9 @@ interface MinimalHeaderProps {
   onFinishAttempt?: () => void;
   disableFinish?: boolean;
   isLearnMode?: boolean;
-  onToggleMode?: () => void;
 }
 
-const MinimalHeader: React.FC<MinimalHeaderProps> = ({ language, setLanguage, darkMode, setDarkMode, onReset, onShowHistory, onShuffle, onFinishAttempt, disableFinish, isLearnMode = false, onToggleMode }) => {
+const MinimalHeader: React.FC<MinimalHeaderProps> = ({ language, setLanguage, darkMode, setDarkMode, onReset, onShowHistory, onShuffle, onFinishAttempt, disableFinish, isLearnMode = false }) => {
   return (
     <header className="fixed top-0 left-0 w-full z-40 bg-white/60 dark:bg-gray-900/60 backdrop-blur-md shadow-sm px-4 py-2">
       <div className="flex flex-col sm:flex-row items-center justify-between gap-2 w-full">
@@ -28,20 +27,9 @@ const MinimalHeader: React.FC<MinimalHeaderProps> = ({ language, setLanguage, da
           >
             Dreamy Quiz
           </a>
-          {onToggleMode && (
-            <span 
-              onClick={onToggleMode}
-              className={`ml-2 text-sm px-2 py-1 rounded-full cursor-pointer transition-all duration-300 hover:opacity-80 ${
-                isLearnMode 
-                  ? 'bg-green-500 text-white' 
-                  : 'bg-blue-500 text-white'
-              }`}
-              title={language === 'en' ? 'Click to toggle mode' : 'Нажмите для переключения режима'}
-            >
-              {isLearnMode 
-                ? (language === 'en' ? 'Learn Mode' : 'Режим обучения')
-                : (language === 'en' ? 'Quiz Mode' : 'Режим тестирования')
-              }
+          {isLearnMode && (
+            <span className="ml-2 text-sm bg-green-500 text-white px-2 py-1 rounded-full">
+              {language === 'en' ? 'Learn Mode' : 'Режим обучения'}
             </span>
           )}
         </h1>
