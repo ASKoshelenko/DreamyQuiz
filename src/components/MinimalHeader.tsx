@@ -26,15 +26,43 @@ const MinimalHeader: React.FC<MinimalHeaderProps> = ({ language, setLanguage, da
           >
             Dreamy Quiz
           </a>
-          <span className="ml-2 text-sm bg-green-500 text-white px-2 py-1 rounded-full">Learn Mode</span>
+          <span className="ml-2 text-sm bg-green-500 text-white px-2 py-1 rounded-full">
+            {language === 'en' ? 'Learn Mode' : 'Режим обучения'}
+          </span>
         </h1>
         <div className="flex items-center gap-2">
+          {/* Переключатель языка */}
+          <div className="flex bg-gray-200 dark:bg-gray-700 rounded-full p-1 mr-1">
+            <button
+              onClick={() => setLanguage('en')}
+              className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                language === 'en' 
+                  ? 'bg-blue-500 text-white' 
+                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+              }`}
+              aria-label="English"
+            >
+              EN
+            </button>
+            <button
+              onClick={() => setLanguage('ru')}
+              className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                language === 'ru' 
+                  ? 'bg-blue-500 text-white' 
+                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+              }`}
+              aria-label="Russian"
+            >
+              RU
+            </button>
+          </div>
+          
           {/* Иконка Shuffle */}
           {onShuffle && (
             <button
               onClick={onShuffle}
               className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-blue-100 dark:hover:bg-blue-800 transition-colors"
-              title="Shuffle Questions"
+              title={language === 'en' ? 'Shuffle Questions' : 'Перемешать вопросы'}
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356-2A9 9 0 106.097 19.423M20 9V4h-5" />
@@ -46,7 +74,7 @@ const MinimalHeader: React.FC<MinimalHeaderProps> = ({ language, setLanguage, da
             <button
               onClick={onShowHistory}
               className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-blue-100 dark:hover:bg-blue-800 transition-colors"
-              title="History"
+              title={language === 'en' ? 'History' : 'История'}
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600 dark:text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -71,26 +99,14 @@ const MinimalHeader: React.FC<MinimalHeaderProps> = ({ language, setLanguage, da
             <button
               onClick={onReset}
               className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-blue-100 dark:hover:bg-blue-800 transition-colors"
-              aria-label="Start Over"
-              title="Start Over"
+              aria-label={language === 'en' ? 'Start Over' : 'Начать заново'}
+              title={language === 'en' ? 'Start Over' : 'Начать заново'}
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600 dark:text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
             </button>
           )}
-          {/* Temporarily commented out language switcher
-          <button
-            onClick={() => setLanguage('en')}
-            className={`p-2 rounded-full ${language === 'en' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-blue-100 dark:hover:bg-blue-800'}`}
-            aria-label="English"
-          >EN</button>
-          <button
-            onClick={() => setLanguage('ru')}
-            className={`p-2 rounded-full ${language === 'ru' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-blue-100 dark:hover:bg-blue-800'}`}
-            aria-label="Russian"
-          >RU</button>
-          */}
           <button
             onClick={() => setDarkMode(!darkMode)}
             className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"

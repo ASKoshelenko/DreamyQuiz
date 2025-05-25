@@ -527,8 +527,34 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
                   </p>
                   {currentQuestion.isMultipleChoice && (
                     <p className="text-sm text-pink-600 mt-2 italic font-semibold">
-                      Select all that apply
+                      {language === 'en' ? 'Select all that apply' : 'Выберите все подходящие варианты'}
                     </p>
+                  )}
+                  {currentQuestion.hasTranslation && (
+                    <div className="flex justify-end mt-2">
+                      <div className="flex bg-gray-200 dark:bg-gray-700 rounded-full p-1">
+                        <button
+                          onClick={() => setLanguage('en')}
+                          className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                            language === 'en' 
+                              ? 'bg-blue-500 text-white' 
+                              : 'text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                          }`}
+                        >
+                          EN
+                        </button>
+                        <button
+                          onClick={() => setLanguage('ru')}
+                          className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                            language === 'ru' 
+                              ? 'bg-blue-500 text-white' 
+                              : 'text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                          }`}
+                        >
+                          RU
+                        </button>
+                      </div>
+                    </div>
                   )}
                 </div>
 
@@ -617,7 +643,7 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
                       : 'bg-gradient-to-r from-blue-400 to-pink-400 text-white hover:scale-105 hover:shadow-xl'}
                   `}
                 >
-                  Previous
+                  {language === 'en' ? 'Previous' : 'Предыдущий'}
                 </button>
                 <button
                   onClick={handleNext}
@@ -628,7 +654,7 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
                       : 'bg-gradient-to-r from-pink-400 to-blue-400 text-white hover:scale-105 hover:shadow-xl'}
                   `}
                 >
-                  Next
+                  {language === 'en' ? 'Next' : 'Следующий'}
                 </button>
               </motion.div>
             )}
@@ -638,7 +664,9 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
         {renderPagination()}
 
         <div className="mt-8 bg-white/10 dark:bg-gray-900/70 rounded-2xl shadow-lg p-4 transition-all duration-500 max-w-3xl w-full mx-auto">
-          <h3 className="text-lg font-bold mb-4 text-white">Question Navigator</h3>
+          <h3 className="text-lg font-bold mb-4 text-white">
+            {language === 'en' ? 'Question Navigator' : 'Навигатор вопросов'}
+          </h3>
           <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-2">
             {questions.map((question, index) => (
               <button
@@ -671,11 +699,24 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
           <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center">
             <div className="bg-white dark:bg-gray-900 rounded-xl p-8 max-w-md w-full shadow-2xl relative flex flex-col items-center">
               <button onClick={() => setShowStats(false)} className="absolute top-2 right-2 p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-blue-200">✕</button>
-              <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Attempt Statistics</h2>
-              <div className="text-lg text-gray-900 dark:text-white mb-2">Answered: <span className="font-bold text-blue-600">{answeredCount}</span> / {questions.length}</div>
-              <div className="text-lg text-gray-900 dark:text-white mb-2">Correct: <span className="font-bold text-pink-500">{correctCount} / {answeredCount}</span></div>
-              <div className="text-lg text-gray-900 dark:text-white mb-2">Score: <span className="font-bold text-pink-500">{scorePercent}%</span></div>
-              <button onClick={() => setShowStats(false)} className="mt-6 px-6 py-2 rounded bg-blue-500 hover:bg-blue-600 text-white font-semibold">Close</button>
+              <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">
+                {language === 'en' ? 'Attempt Statistics' : 'Статистика попытки'}
+              </h2>
+              <div className="text-lg text-gray-900 dark:text-white mb-2">
+                {language === 'en' ? 'Answered: ' : 'Отвечено: '}
+                <span className="font-bold text-blue-600">{answeredCount}</span> / {questions.length}
+              </div>
+              <div className="text-lg text-gray-900 dark:text-white mb-2">
+                {language === 'en' ? 'Correct: ' : 'Правильно: '}
+                <span className="font-bold text-pink-500">{correctCount} / {answeredCount}</span>
+              </div>
+              <div className="text-lg text-gray-900 dark:text-white mb-2">
+                {language === 'en' ? 'Score: ' : 'Счет: '}
+                <span className="font-bold text-pink-500">{scorePercent}%</span>
+              </div>
+              <button onClick={() => setShowStats(false)} className="mt-6 px-6 py-2 rounded bg-blue-500 hover:bg-blue-600 text-white font-semibold">
+                {language === 'en' ? 'Close' : 'Закрыть'}
+              </button>
             </div>
           </div>
         )}
@@ -698,29 +739,38 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center">
           <div className="bg-white dark:bg-gray-900 rounded-xl p-6 max-w-lg w-full shadow-2xl relative">
             <button onClick={() => setShowHistory(false)} className="absolute top-2 right-2 p-2 rounded-full bg-gray-200 dark:bg-gray-700 hover:bg-blue-200">✕</button>
-            <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">Quiz History</h2>
+            <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
+              {language === 'en' ? 'Quiz History' : 'История викторины'}
+            </h2>
             <table className="w-full text-sm mb-4">
               <thead><tr>
-                <th className="text-white">Date</th>
-                <th className="text-white">Score</th>
-                <th className="text-white">Correct</th>
-                <th className="text-white">Status</th>
+                <th className="text-white">{language === 'en' ? 'Date' : 'Дата'}</th>
+                <th className="text-white">{language === 'en' ? 'Score' : 'Счет'}</th>
+                <th className="text-white">{language === 'en' ? 'Correct' : 'Правильно'}</th>
+                <th className="text-white">{language === 'en' ? 'Status' : 'Статус'}</th>
               </tr></thead>
               <tbody>
                 {history.length === 0 && (
-                  <tr><td colSpan={4} className="text-center text-gray-400 py-4">No attempts yet</td></tr>
+                  <tr><td colSpan={4} className="text-center text-gray-400 py-4">
+                    {language === 'en' ? 'No attempts yet' : 'Пока нет попыток'}
+                  </td></tr>
                 )}
                 {history.map((h, i) => (
                   <tr key={i} className="border-b border-gray-200 dark:border-gray-700">
                     <td>{new Date(h.date).toLocaleString()}</td>
                     <td>{h.score}%</td>
                     <td>{h.correct}/{h.total}</td>
-                    <td>{h.partial ? <span className="text-pink-500 font-semibold">Partial</span> : <span className="text-blue-600 font-semibold">Full</span>}</td>
+                    <td>{h.partial 
+                      ? <span className="text-pink-500 font-semibold">{language === 'en' ? 'Partial' : 'Частично'}</span> 
+                      : <span className="text-blue-600 font-semibold">{language === 'en' ? 'Full' : 'Полностью'}</span>}
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-            <button onClick={() => { setHistory([]); localStorage.removeItem(historyKey); }} className="px-4 py-2 rounded bg-pink-500 hover:bg-pink-600 text-white font-semibold">Clear History</button>
+            <button onClick={() => { setHistory([]); localStorage.removeItem(historyKey); }} className="px-4 py-2 rounded bg-pink-500 hover:bg-pink-600 text-white font-semibold">
+              {language === 'en' ? 'Clear History' : 'Очистить историю'}
+            </button>
           </div>
         </div>
       )}
