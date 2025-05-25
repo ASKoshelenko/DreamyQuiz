@@ -11,28 +11,53 @@ interface MinimalHeaderProps {
   onFinishAttempt?: () => void;
   disableFinish?: boolean;
   isLearnMode?: boolean;
+  currentQuizName?: string;
 }
 
-const MinimalHeader: React.FC<MinimalHeaderProps> = ({ language, setLanguage, darkMode, setDarkMode, onReset, onShowHistory, onShuffle, onFinishAttempt, disableFinish, isLearnMode = false }) => {
+const MinimalHeader: React.FC<MinimalHeaderProps> = ({ 
+  language, 
+  setLanguage, 
+  darkMode, 
+  setDarkMode, 
+  onReset, 
+  onShowHistory, 
+  onShuffle, 
+  onFinishAttempt, 
+  disableFinish, 
+  isLearnMode = false,
+  currentQuizName = '' 
+}) => {
   return (
     <header className="fixed top-0 left-0 w-full z-40 bg-white/60 dark:bg-gray-900/60 backdrop-blur-md shadow-sm px-4 py-2">
       <div className="flex flex-col sm:flex-row items-center justify-between gap-2 w-full">
-        <h1 className="text-xl sm:text-2xl font-bold select-none mb-1 sm:mb-0 flex items-center gap-2">
-          <a
-            href="https://smartbee.me"
-            rel="noopener noreferrer"
-            className="bg-gradient-to-r from-pink-500 to-blue-500 bg-clip-text text-transparent hover:underline transition-colors"
-            title="Go to smartbee.me"
-            style={{ cursor: 'pointer' }}
-          >
-            Dreamy Quiz
-          </a>
+        <div className="flex flex-col sm:flex-row items-center gap-2">
+          <h1 className="text-xl sm:text-2xl font-bold select-none mb-1 sm:mb-0 flex items-center gap-2">
+            <a
+              href="https://smartbee.me"
+              rel="noopener noreferrer"
+              className="bg-gradient-to-r from-pink-500 to-blue-500 bg-clip-text text-transparent hover:underline transition-colors"
+              title="Go to smartbee.me"
+              style={{ cursor: 'pointer' }}
+            >
+              Dreamy Quiz
+            </a>
+          </h1>
+          
+          {currentQuizName && (
+            <div className="flex items-center">
+              <span className="mx-2 text-gray-400 hidden sm:inline">/</span>
+              <span className="font-medium text-gray-700 dark:text-gray-300 text-sm sm:text-base">
+                {currentQuizName}
+              </span>
+            </div>
+          )}
+          
           {isLearnMode && (
             <span className="ml-2 text-sm bg-green-500 text-white px-2 py-1 rounded-full">
               {language === 'en' ? 'Learn Mode' : 'Режим обучения'}
             </span>
           )}
-        </h1>
+        </div>
         <div className="flex items-center gap-2">
           {/* Переключатель языка */}
           <div className="flex bg-gray-200 dark:bg-gray-700 rounded-full p-1 mr-1">

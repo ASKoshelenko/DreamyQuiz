@@ -13,7 +13,9 @@ function App() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [shuffledQuestions, setShuffledQuestions] = useState<Question[]>([]);
   const [isFileUploaded, setIsFileUploaded] = useState(false);
+  const [showFileUpload, setShowFileUpload] = useState(false);
   const [showQuizSelector, setShowQuizSelector] = useState(true);
+  const [currentQuizName, setCurrentQuizName] = useState<string>('');
   const [language, setLanguage] = useState<'en' | 'ru'>('en');
   const [darkMode, setDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -31,7 +33,9 @@ function App() {
     setQuestions(parsedQuestions);
     setShuffledQuestions(parsedQuestions);
     setIsFileUploaded(true);
+    setShowFileUpload(false);
     setShowQuizSelector(false);
+    setCurrentQuizName('Custom Quiz');
     setShowModeSelector(true);
   };
 
@@ -40,16 +44,24 @@ function App() {
     setShuffledQuestions(selectedQuestions);
     setIsFileUploaded(true);
     setShowQuizSelector(false);
+    setCurrentQuizName(quizName);
     setShowModeSelector(true);
   };
 
-  const handleReturnToUpload = () => {
+  const handleReturnToQuizSelector = () => {
     setIsFileUploaded(false);
     setQuestions([]);
     setShuffledQuestions([]);
     setShowQuizSelector(true);
+    setShowFileUpload(false);
     setQuizMode(null);
     setShowModeSelector(false);
+    setCurrentQuizName('');
+  };
+
+  const handleShowFileUpload = () => {
+    setShowQuizSelector(false);
+    setShowFileUpload(true);
   };
 
   const handleShuffleQuestions = () => {
@@ -68,18 +80,19 @@ function App() {
         setLanguage={setLanguage}
         darkMode={darkMode}
         setDarkMode={setDarkMode}
-        onReset={isFileUploaded ? handleReturnToUpload : undefined}
+        onReset={isFileUploaded ? handleReturnToQuizSelector : undefined}
         isLearnMode={quizMode === 'learn'}
+        currentQuizName={currentQuizName}
       />
       <main className="flex-1 app-content">
         {showQuizSelector ? (
           <QuizSelector 
             onSelectQuiz={handleQuizSelect} 
-            onUploadFile={() => setShowQuizSelector(false)} 
+            onUploadFile={handleShowFileUpload} 
             darkMode={darkMode}
             setDarkMode={setDarkMode}
           />
-        ) : !isFileUploaded ? (
+        ) : showFileUpload ? (
           <FileUpload onFileUpload={handleFileUpload} />
         ) : showModeSelector ? (
           <ModeSelector 
@@ -91,12 +104,12 @@ function App() {
         ) : (
           <Quiz 
             questions={shuffledQuestions} 
-            onReturnToUpload={handleReturnToUpload}
+            onReturnToUpload={handleReturnToQuizSelector}
             language={language}
             setLanguage={setLanguage}
             darkMode={darkMode}
             setDarkMode={setDarkMode}
-            resetQuiz={handleReturnToUpload}
+            resetQuiz={handleReturnToQuizSelector}
             onShuffle={handleShuffleQuestions}
             footerRef={footerRef}
             isLearnMode={quizMode === 'learn'}
