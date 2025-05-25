@@ -22,7 +22,8 @@ interface QuizProps {
 const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setLanguage, darkMode, setDarkMode, resetQuiz, onShuffle, footerRef }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [userAnswers, setUserAnswers] = useState<Record<string, string | string[]>>({});
-  const [showResult, setShowResult] = useState(false);
+  const [showResult, setShowResult] = useState(true);
+  const [learnMode] = useState(true);
   const [pageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [modalImage, setModalImage] = useState<string | null>(null);
@@ -173,6 +174,8 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
   }, [finished]);
 
   const handleAnswer = useCallback((answer: string) => {
+    if (learnMode) return;
+    
     const currentQuestion = questions[currentQuestionIndex];
     
     if (currentQuestion.isMultipleChoice) {
@@ -200,7 +203,7 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
       }));
       setShowResult(true);
     }
-  }, [currentQuestionIndex, questions, userAnswers]);
+  }, [currentQuestionIndex, questions, userAnswers, learnMode]);
 
   const handleSubmitMultipleChoice = useCallback(() => {
     setShowResult(true);
@@ -209,16 +212,20 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
   const handleNext = useCallback(() => {
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(prev => prev + 1);
-      setShowResult(false);
+      if (!learnMode) {
+        setShowResult(false);
+      }
     }
-  }, [currentQuestionIndex, questions.length]);
+  }, [currentQuestionIndex, questions.length, learnMode]);
 
   const handlePrevious = useCallback(() => {
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(prev => prev - 1);
-      setShowResult(false);
+      if (!learnMode) {
+        setShowResult(false);
+      }
     }
-  }, [currentQuestionIndex]);
+  }, [currentQuestionIndex, learnMode]);
 
   const handleImageClick = useCallback((imagePath: string) => {
     setModalImage(imagePath);
@@ -418,6 +425,11 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
               className="w-full rounded-2xl shadow-2xl p-8 sm:p-12 bg-white/10 dark:bg-gray-900/70 backdrop-blur-xl transition-all duration-500 max-w-3xl mx-auto"
             >
               <div className="mb-6">
+                {learnMode && (
+                  <div className="text-center mb-4">
+                    <span className="inline-block px-4 py-2 bg-green-500 text-white font-bold rounded-full">Режим обучения</span>
+                  </div>
+                )}
                 <div className="text-center mb-2">
                   <span className="text-lg font-semibold text-white">Total Score: {score}%</span>
                 </div>
@@ -537,7 +549,7 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
                         <button
                           key={answer.label}
                           onClick={() => handleAnswer(answer.label)}
-                          disabled={showResult && !currentQuestion.isMultipleChoice}
+                          disabled={learnMode || (showResult && !currentQuestion.isMultipleChoice)}
                           className={`w-full text-left p-4 sm:p-5 rounded-xl border-2 font-semibold text-lg shadow-sm transition-all duration-200 min-h-[56px] sm:min-h-[64px] active:scale-95
                           ${showResult
                             ? isCorrect
@@ -558,7 +570,7 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
                       );
                     })}
                     
-                    {currentQuestion.isMultipleChoice && !showResult && (
+                    {currentQuestion.isMultipleChoice && !showResult && !learnMode && (
                       <div className="mt-4 flex justify-center">
                         <button
                           onClick={handleSubmitMultipleChoice}
@@ -639,11 +651,13 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
                 className={`aspect-square rounded-xl flex items-center justify-center text-base font-bold shadow-sm transition-all duration-200
                   ${currentQuestionIndex === index
                     ? 'bg-gradient-to-br from-blue-400 to-pink-400 text-white scale-110 shadow-lg'
+                    : learnMode
+                    ? 'bg-green-400 text-white'
                     : userAnswers[question.id]
-                    ? userAnswers[question.id] === question.correctAnswer
-                      ? 'bg-green-400 text-white'
-                      : 'bg-pink-400 text-white'
-                    : 'bg-gray-200 dark:bg-gray-700 hover:bg-pink-200 dark:hover:bg-pink-700'}
+                      ? userAnswers[question.id] === question.correctAnswer
+                        ? 'bg-green-400 text-white'
+                        : 'bg-pink-400 text-white'
+                      : 'bg-gray-200 dark:bg-gray-700 hover:bg-pink-200 dark:hover:bg-pink-700'}
                 `}
               >
                 {question.id}

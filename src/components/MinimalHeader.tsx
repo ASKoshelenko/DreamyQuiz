@@ -26,6 +26,7 @@ const MinimalHeader: React.FC<MinimalHeaderProps> = ({ language, setLanguage, da
           >
             Dreamy Quiz
           </a>
+          <span className="ml-2 text-sm bg-green-500 text-white px-2 py-1 rounded-full">Learn Mode</span>
         </h1>
         <div className="flex items-center gap-2">
           {/* Иконка Shuffle */}
@@ -52,8 +53,8 @@ const MinimalHeader: React.FC<MinimalHeaderProps> = ({ language, setLanguage, da
               </svg>
             </button>
           )}
-          {/* Иконка Finish Attempt */}
-          {onFinishAttempt && (
+          {/* Иконка Finish Attempt - скрываем в режиме обучения */}
+          {onFinishAttempt && false && (
             <button
               onClick={onFinishAttempt}
               className="p-2 rounded-full bg-gradient-to-r from-pink-500 to-blue-500 hover:scale-110 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-pink-400 text-white flex items-center justify-center transition-all duration-200 disabled:opacity-50"
