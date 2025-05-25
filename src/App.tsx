@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import FileUpload from './components/FileUpload';
 import Quiz from './components/Quiz';
 import QuizSelector from './components/QuizSelector';
+import ModeSelector from './components/ModeSelector';
 import { Question, parseQuestions } from './utils/questionParser';
 import MinimalHeader from './components/MinimalHeader';
 import { shuffleArray } from './utils/shuffle';
@@ -21,6 +22,8 @@ function App() {
     }
     return false;
   });
+  const [quizMode, setQuizMode] = useState<'quiz' | 'learn' | null>(null);
+  const [showModeSelector, setShowModeSelector] = useState(false);
   const footerRef = useRef<HTMLElement>(null);
 
   const handleFileUpload = (content: string, fileName: string) => {
@@ -29,6 +32,7 @@ function App() {
     setShuffledQuestions(parsedQuestions);
     setIsFileUploaded(true);
     setShowQuizSelector(false);
+    setShowModeSelector(true);
   };
 
   const handleQuizSelect = (selectedQuestions: Question[], quizName: string) => {
@@ -36,6 +40,7 @@ function App() {
     setShuffledQuestions(selectedQuestions);
     setIsFileUploaded(true);
     setShowQuizSelector(false);
+    setShowModeSelector(true);
   };
 
   const handleReturnToUpload = () => {
@@ -43,10 +48,17 @@ function App() {
     setQuestions([]);
     setShuffledQuestions([]);
     setShowQuizSelector(true);
+    setQuizMode(null);
+    setShowModeSelector(false);
   };
 
   const handleShuffleQuestions = () => {
     setShuffledQuestions(shuffleArray(questions));
+  };
+
+  const handleModeSelect = (mode: 'quiz' | 'learn') => {
+    setQuizMode(mode);
+    setShowModeSelector(false);
   };
 
   return (
@@ -57,6 +69,7 @@ function App() {
         darkMode={darkMode}
         setDarkMode={setDarkMode}
         onReset={isFileUploaded ? handleReturnToUpload : undefined}
+        isLearnMode={quizMode === 'learn'}
       />
       <main className="flex-1 app-content">
         {showQuizSelector ? (
@@ -66,6 +79,11 @@ function App() {
           />
         ) : !isFileUploaded ? (
           <FileUpload onFileUpload={handleFileUpload} />
+        ) : showModeSelector ? (
+          <ModeSelector 
+            onSelectMode={handleModeSelect} 
+            language={language} 
+          />
         ) : (
           <Quiz 
             questions={shuffledQuestions} 
@@ -77,6 +95,7 @@ function App() {
             resetQuiz={handleReturnToUpload}
             onShuffle={handleShuffleQuestions}
             footerRef={footerRef}
+            isLearnMode={quizMode === 'learn'}
           />
         )}
       </main>

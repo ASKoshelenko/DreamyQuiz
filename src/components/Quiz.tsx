@@ -17,12 +17,13 @@ interface QuizProps {
   resetQuiz: () => void;
   onShuffle: () => void;
   footerRef?: React.RefObject<HTMLElement>;
+  isLearnMode?: boolean;
 }
 
-const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setLanguage, darkMode, setDarkMode, resetQuiz, onShuffle, footerRef }) => {
+const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setLanguage, darkMode, setDarkMode, resetQuiz, onShuffle, footerRef, isLearnMode = false }) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [userAnswers, setUserAnswers] = useState<Record<string, string | string[]>>({});
-  const [showResult, setShowResult] = useState(false);
+  const [showResult, setShowResult] = useState(isLearnMode);
   const [pageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
   const [modalImage, setModalImage] = useState<string | null>(null);
@@ -114,6 +115,8 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
 
   // Восстановление прогресса при загрузке
   useEffect(() => {
+    if (isLearnMode) return;
+    
     const saved = localStorage.getItem(storageKey);
     if (saved) {
       try {
@@ -125,12 +128,14 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
       } catch {}
     }
     // eslint-disable-next-line
-  }, [storageKey]);
+  }, [storageKey, isLearnMode]);
 
   // Сохраняем прогресс при изменениях
   useEffect(() => {
-    localStorage.setItem(storageKey, JSON.stringify({ userAnswers, currentQuestionIndex }));
-  }, [userAnswers, currentQuestionIndex, storageKey]);
+    if (!isLearnMode) {
+      localStorage.setItem(storageKey, JSON.stringify({ userAnswers, currentQuestionIndex }));
+    }
+  }, [userAnswers, currentQuestionIndex, storageKey, isLearnMode]);
 
   // Загрузка истории при монтировании
   useEffect(() => {
@@ -146,6 +151,8 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
 
   // Сохраняем попытку в историю при ручном завершении или полном прохождении
   useEffect(() => {
+    if (isLearnMode) return;
+    
     const allAnswered = questions.length > 0 && questions.every(q => userAnswers[q.id]);
     if ((allAnswered || finished) && Object.keys(userAnswers).length > 0) {
       const score = calculateScore();
@@ -163,16 +170,18 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
       setFinished(false); // сбрасываем флаг после сохранения
     }
     // eslint-disable-next-line
-  }, [userAnswers, questions, calculateScore, finished]);
+  }, [userAnswers, questions, calculateScore, finished, isLearnMode]);
 
   // Показываем статистику после ручного завершения попытки
   useEffect(() => {
-    if (finished) {
+    if (finished && !isLearnMode) {
       setShowStats(true);
     }
-  }, [finished]);
+  }, [finished, isLearnMode]);
 
   const handleAnswer = useCallback((answer: string) => {
+    if (isLearnMode) return;
+    
     const currentQuestion = questions[currentQuestionIndex];
     
     if (currentQuestion.isMultipleChoice) {
@@ -200,7 +209,7 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
       }));
       setShowResult(true);
     }
-  }, [currentQuestionIndex, questions, userAnswers]);
+  }, [currentQuestionIndex, questions, userAnswers, isLearnMode]);
 
   const handleSubmitMultipleChoice = useCallback(() => {
     setShowResult(true);
@@ -209,16 +218,20 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
   const handleNext = useCallback(() => {
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(prev => prev + 1);
-      setShowResult(false);
+      if (!isLearnMode) {
+        setShowResult(false);
+      }
     }
-  }, [currentQuestionIndex, questions.length]);
+  }, [currentQuestionIndex, questions.length, isLearnMode]);
 
   const handlePrevious = useCallback(() => {
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(prev => prev - 1);
-      setShowResult(false);
+      if (!isLearnMode) {
+        setShowResult(false);
+      }
     }
-  }, [currentQuestionIndex]);
+  }, [currentQuestionIndex, isLearnMode]);
 
   const handleImageClick = useCallback((imagePath: string) => {
     setModalImage(imagePath);
@@ -401,10 +414,11 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
         darkMode={darkMode}
         setDarkMode={setDarkMode}
         onReset={onReturnToUpload}
-        onShowHistory={() => setShowHistory(true)}
+        onShowHistory={!isLearnMode ? () => setShowHistory(true) : undefined}
         onShuffle={onShuffle}
-        onFinishAttempt={() => setFinished(true)}
+        onFinishAttempt={!isLearnMode ? () => setFinished(true) : undefined}
         disableFinish={Object.keys(userAnswers).length === 0}
+        isLearnMode={isLearnMode}
       />
       <div className="w-full max-w-5xl flex-1 flex flex-col justify-center items-center px-2 sm:px-6 py-8">
         <div ref={questionBlockRef} className="w-full flex flex-col items-center">
@@ -418,13 +432,22 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
               className="w-full rounded-2xl shadow-2xl p-8 sm:p-12 bg-white/10 dark:bg-gray-900/70 backdrop-blur-xl transition-all duration-500 max-w-3xl mx-auto"
             >
               <div className="mb-6">
+                {isLearnMode && (
+                  <div className="text-center mb-4">
+                    <span className="inline-block px-4 py-2 bg-green-500 text-white font-bold rounded-full">
+                      {language === 'en' ? 'Learn Mode' : 'Режим обучения'}
+                    </span>
+                  </div>
+                )}
                 <div className="text-center mb-2">
-                  <span className="text-lg font-semibold text-white">Total Score: {score}%</span>
+                  <span className="text-lg font-semibold text-white">
+                    {!isLearnMode ? `${language === 'en' ? 'Total Score' : 'Общий счет'}: ${score}%` : ''}
+                  </span>
                 </div>
                 <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
                   <div
                     className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
-                    style={{ width: `${score}%` }}
+                    style={{ width: !isLearnMode ? `${score}%` : '100%' }}
                   ></div>
                 </div>
                 {/* Stepper progress bar */}
@@ -445,9 +468,6 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
                   <span className="ml-3 text-xs sm:text-sm text-white font-semibold hidden sm:inline-block">
                     {currentQuestionIndex + 1} / {questions.length}
                   </span>
-                </div>
-                <div className="flex justify-between items-center mt-2">
-                  {/* Удаляю Question 1 of 553 */}
                 </div>
               </div>
 
@@ -515,14 +535,44 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
                   </p>
                   {currentQuestion.isMultipleChoice && (
                     <p className="text-sm text-pink-600 mt-2 italic font-semibold">
-                      Select all that apply
+                      {language === 'en' ? 'Select all that apply' : 'Выберите все подходящие варианты'}
                     </p>
+                  )}
+                  {currentQuestion.hasTranslation && (
+                    <div className="flex justify-end mt-2">
+                      <div className="flex bg-gray-200 dark:bg-gray-700 rounded-full p-1">
+                        <button
+                          onClick={() => setLanguage('en')}
+                          className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                            language === 'en' 
+                              ? 'bg-blue-500 text-white' 
+                              : 'text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                          }`}
+                        >
+                          EN
+                        </button>
+                        <button
+                          onClick={() => setLanguage('ru')}
+                          className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                            language === 'ru' 
+                              ? 'bg-blue-500 text-white' 
+                              : 'text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-600'
+                          }`}
+                        >
+                          RU
+                        </button>
+                      </div>
+                    </div>
                   )}
                 </div>
 
                 {currentQuestion.isInformational ? (
                   <div className="bg-blue-50 dark:bg-blue-900 p-4 rounded-lg">
-                    <p className="text-blue-700 dark:text-blue-200">This is an informational question. Read and understand the content.</p>
+                    <p className="text-blue-700 dark:text-blue-200">
+                      {language === 'en' 
+                        ? 'This is an informational question. Read and understand the content.' 
+                        : 'Это информационный вопрос. Прочитайте и поймите содержание.'}
+                    </p>
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -537,7 +587,7 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
                         <button
                           key={answer.label}
                           onClick={() => handleAnswer(answer.label)}
-                          disabled={showResult && !currentQuestion.isMultipleChoice}
+                          disabled={isLearnMode || (showResult && !currentQuestion.isMultipleChoice)}
                           className={`w-full text-left p-4 sm:p-5 rounded-xl border-2 font-semibold text-lg shadow-sm transition-all duration-200 min-h-[56px] sm:min-h-[64px] active:scale-95
                           ${showResult
                             ? isCorrect
@@ -558,7 +608,7 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
                       );
                     })}
                     
-                    {currentQuestion.isMultipleChoice && !showResult && (
+                    {currentQuestion.isMultipleChoice && !showResult && !isLearnMode && (
                       <div className="mt-4 flex justify-center">
                         <button
                           onClick={handleSubmitMultipleChoice}
@@ -569,7 +619,7 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
                               : 'bg-gray-400 cursor-not-allowed'}
                           `}
                         >
-                          Submit
+                          {language === 'en' ? 'Submit' : 'Подтвердить'}
                         </button>
                       </div>
                     )}
@@ -605,7 +655,7 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
                       : 'bg-gradient-to-r from-blue-400 to-pink-400 text-white hover:scale-105 hover:shadow-xl'}
                   `}
                 >
-                  Previous
+                  {language === 'en' ? 'Previous' : 'Предыдущий'}
                 </button>
                 <button
                   onClick={handleNext}
@@ -616,7 +666,7 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
                       : 'bg-gradient-to-r from-pink-400 to-blue-400 text-white hover:scale-105 hover:shadow-xl'}
                   `}
                 >
-                  Next
+                  {language === 'en' ? 'Next' : 'Следующий'}
                 </button>
               </motion.div>
             )}
@@ -626,24 +676,30 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
         {renderPagination()}
 
         <div className="mt-8 bg-white/10 dark:bg-gray-900/70 rounded-2xl shadow-lg p-4 transition-all duration-500 max-w-3xl w-full mx-auto">
-          <h3 className="text-lg font-bold mb-4 text-white">Question Navigator</h3>
+          <h3 className="text-lg font-bold mb-4 text-white">
+            {language === 'en' ? 'Question Navigator' : 'Навигатор вопросов'}
+          </h3>
           <div className="grid grid-cols-5 sm:grid-cols-8 md:grid-cols-10 gap-2">
             {questions.map((question, index) => (
               <button
                 key={question.id}
                 onClick={() => {
                   setCurrentQuestionIndex(index);
-                  setShowResult(false);
+                  if (!isLearnMode) {
+                    setShowResult(false);
+                  }
                   setTimeout(scrollToQuestion, 100); // плавный скролл к вопросу
                 }}
                 className={`aspect-square rounded-xl flex items-center justify-center text-base font-bold shadow-sm transition-all duration-200
                   ${currentQuestionIndex === index
                     ? 'bg-gradient-to-br from-blue-400 to-pink-400 text-white scale-110 shadow-lg'
+                    : isLearnMode
+                    ? 'bg-green-400 text-white'
                     : userAnswers[question.id]
-                    ? userAnswers[question.id] === question.correctAnswer
-                      ? 'bg-green-400 text-white'
-                      : 'bg-pink-400 text-white'
-                    : 'bg-gray-200 dark:bg-gray-700 hover:bg-pink-200 dark:hover:bg-pink-700'}
+                      ? userAnswers[question.id] === question.correctAnswer
+                        ? 'bg-green-400 text-white'
+                        : 'bg-pink-400 text-white'
+                      : 'bg-gray-200 dark:bg-gray-700 hover:bg-pink-200 dark:hover:bg-pink-700'}
                 `}
               >
                 {question.id}
