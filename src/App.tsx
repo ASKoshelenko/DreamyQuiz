@@ -61,7 +61,7 @@ function App() {
     setShowModeSelector(false);
   };
 
-  // Функция для переключения между режимами квиз/учеба
+  // Функция для переключения между режимами тестирования и обучения
   const handleToggleMode = () => {
     if (quizMode === 'quiz') {
       setQuizMode('learn');
@@ -79,9 +79,9 @@ function App() {
         setDarkMode={setDarkMode}
         onReset={isFileUploaded ? handleReturnToUpload : undefined}
         isLearnMode={quizMode === 'learn'}
-        onToggleMode={!showQuizSelector && !showModeSelector && quizMode ? handleToggleMode : undefined}
+        onToggleMode={isFileUploaded && !showModeSelector ? handleToggleMode : undefined}
       />
-      <main className="flex-1 app-content pt-16">
+      <main className="flex-1 app-content">
         {showQuizSelector ? (
           <QuizSelector 
             onSelectQuiz={handleQuizSelect} 
