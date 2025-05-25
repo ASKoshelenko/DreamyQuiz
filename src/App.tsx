@@ -61,6 +61,15 @@ function App() {
     setShowModeSelector(false);
   };
 
+  // Функция для переключения между режимами квиз/учеба
+  const handleToggleMode = () => {
+    if (quizMode === 'quiz') {
+      setQuizMode('learn');
+    } else {
+      setQuizMode('quiz');
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <MinimalHeader
@@ -70,6 +79,7 @@ function App() {
         setDarkMode={setDarkMode}
         onReset={isFileUploaded ? handleReturnToUpload : undefined}
         isLearnMode={quizMode === 'learn'}
+        onToggleMode={!showQuizSelector && !showModeSelector && quizMode ? handleToggleMode : undefined}
       />
       <main className="flex-1 app-content">
         {showQuizSelector ? (

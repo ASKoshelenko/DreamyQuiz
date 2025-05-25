@@ -298,6 +298,16 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [currentQuestionIndex, handleAnswer, handleNext, handlePrevious, handleSubmitMultipleChoice, modalImage, showResult, questions]);
 
+  // Обновляем showResult при изменении режима
+  useEffect(() => {
+    setShowResult(isLearnMode);
+    
+    // При переключении в режим обучения сбрасываем навигацию к текущему вопросу
+    if (isLearnMode) {
+      setTimeout(scrollToQuestion, 100);
+    }
+  }, [isLearnMode, scrollToQuestion]);
+
   // Guard clause for empty questions array
   if (!questions || questions.length === 0) {
     return <div className="quiz-container">No questions available.</div>;
