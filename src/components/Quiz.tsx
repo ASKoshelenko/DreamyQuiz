@@ -255,12 +255,12 @@ const Quiz: React.FC<QuizProps> = ({ questions, onReturnToUpload, language, setL
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Функция для скролла к вопросу
-  const scrollToQuestion = () => {
+  // Функция для скролла к вопросу - оборачиваем в useCallback
+  const scrollToQuestion = useCallback(() => {
     if (questionBlockRef.current) {
       questionBlockRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
-  };
+  }, [questionBlockRef]);
 
   // Горячие клавиши: A-Z, 1-9, стрелки, Enter
   React.useEffect(() => {

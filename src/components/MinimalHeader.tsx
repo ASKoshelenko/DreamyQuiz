@@ -39,12 +39,17 @@ const MinimalHeader: React.FC<MinimalHeaderProps> = ({ language, setLanguage, da
           {onToggleMode && (
             <button
               onClick={onToggleMode}
-              className={`p-2 rounded-full ${isLearnMode ? 'bg-green-500 hover:bg-green-600' : 'bg-blue-500 hover:bg-blue-600'} text-white hover:scale-105 transition-all duration-200 shadow-md`}
+              className={`p-3 rounded-xl flex items-center ${isLearnMode ? 'bg-green-500 hover:bg-green-600' : 'bg-blue-500 hover:bg-blue-600'} text-white hover:scale-105 transition-all duration-200 shadow-md mr-2`}
               title={isLearnMode 
                 ? (language === 'en' ? 'Switch to Quiz Mode' : 'Переключиться в режим тестирования') 
                 : (language === 'en' ? 'Switch to Learn Mode' : 'Переключиться в режим обучения')
               }
             >
+              <span className="font-bold mr-2 text-sm">
+                {isLearnMode 
+                  ? (language === 'en' ? 'Quiz' : 'Тест') 
+                  : (language === 'en' ? 'Learn' : 'Учеба')}
+              </span>
               {isLearnMode ? (
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
