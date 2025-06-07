@@ -7,9 +7,11 @@ import { Question, parseQuestions } from './utils/questionParser';
 import MinimalHeader from './components/MinimalHeader';
 import { shuffleArray } from './utils/shuffle';
 import Footer from './components/Footer';
+import Auth from './components/Auth';
 import './App.css';
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [shuffledQuestions, setShuffledQuestions] = useState<Question[]>([]);
   const [isFileUploaded, setIsFileUploaded] = useState(false);
@@ -27,6 +29,15 @@ function App() {
   const [quizMode, setQuizMode] = useState<'quiz' | 'learn' | null>(null);
   const [showModeSelector, setShowModeSelector] = useState(false);
   const footerRef = useRef<HTMLElement>(null);
+
+  const handleLogin = () => {
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    handleReturnToQuizSelector();
+  };
 
   const handleFileUpload = (content: string, fileName: string) => {
     const parsedQuestions = parseQuestions(content);
@@ -73,6 +84,10 @@ function App() {
     setShowModeSelector(false);
   };
 
+  if (!isAuthenticated) {
+    return <Auth onLogin={handleLogin} />;
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
       <MinimalHeader
@@ -83,6 +98,7 @@ function App() {
         onReset={isFileUploaded ? handleReturnToQuizSelector : undefined}
         isLearnMode={quizMode === 'learn'}
         currentQuizName={currentQuizName}
+        onLogout={handleLogout}
       />
       <main className="flex-1 app-content">
         {showQuizSelector ? (
