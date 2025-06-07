@@ -3,7 +3,7 @@
   width: 100vw;
   padding: 0;
   margin: 0;
-  background: linear-gradient(135deg, #1e3a8a 0%, #111827 60%, #db2777 100%);
+  background: linear-gradient(135deg, #1e3a8a 0%, #111827 60%, #c770f0 100%);
 }
 
 .app-header {
@@ -14,7 +14,7 @@
 .app-header h1 {
   font-size: 2.5rem;
   font-weight: bold;
-  color: #1f2937;
+  color: #ffffff;
   margin-bottom: 1rem;
   display: inline-flex;
   align-items: center;
@@ -26,6 +26,7 @@
 .app-header h1:hover {
   transform: translateY(-1px);
   text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  color: #c770f0;
 }
 
 .app-header h1 svg {
@@ -38,7 +39,7 @@
 
 .app-header h2 {
   font-size: 1.25rem;
-  color: #4b5563;
+  color: #e5e7eb;
 }
 
 .app-content {
@@ -67,15 +68,17 @@
 
 .control-button {
   padding: 0.5rem 1rem;
-  background-color: #e5e7eb;
-  color: #374151;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
   border-radius: 0.5rem;
   font-weight: 500;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .control-button:hover {
-  background-color: #d1d5db;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #c770f0;
 }
 
 .language-toggle {
@@ -88,20 +91,22 @@
   border-radius: 0.5rem;
   font-weight: 500;
   transition: all 0.2s;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .language-button.active {
-  background-color: #2563eb;
+  background-color: #c770f0;
   color: white;
 }
 
 .language-button:not(.active) {
-  background-color: #e5e7eb;
-  color: #374151;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
 }
 
 .language-button:not(.active):hover {
-  background-color: #d1d5db;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #c770f0;
 }
 
 /* Progress Bar */
@@ -112,19 +117,38 @@
 .progress-text {
   text-align: center;
   margin-bottom: 0.5rem;
-  color: #4b5563;
+  color: #e5e7eb;
 }
 
 .progress-bar {
   width: 100%;
   height: 0.5rem;
-  background-color: #e5e7eb;
+  background-color: rgba(255, 255, 255, 0.1);
   border-radius: 9999px;
   overflow: hidden;
 }
 
 .progress-fill {
   height: 100%;
-  background-color: #2563eb;
+  background-color: #c770f0;
   transition: width 0.3s ease;
+}
+
+/* Portfolio link styles */
+.portfolio-link {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  text-decoration: none;
+  border-radius: 0.5rem;
+  transition: all 0.2s;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.portfolio-link:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #c770f0;
+  transform: translateY(-1px);
 } 

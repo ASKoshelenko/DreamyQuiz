@@ -1,0 +1,132 @@
+[
+  {
+    "id": "ai102-001",
+    "text": "You are implementing an Azure Cognitive Search solution. You need to ensure that a string field called 'Description' in your index can be searched for individual words. Which analyzer should you use?",
+    "hasTranslation": true,
+    "textRu": "Вы внедряете решение Azure Cognitive Search. Вам нужно обеспечить возможность поиска отдельных слов в строковом поле 'Description' в вашем индексе. Какой анализатор следует использовать?",
+    "answers": [
+      {
+        "label": "A",
+        "text": "standard.lucene"
+      },
+      {
+        "label": "B",
+        "text": "keyword"
+      },
+      {
+        "label": "C",
+        "text": "whitespace"
+      },
+      {
+        "label": "D",
+        "text": "simple"
+      }
+    ],
+    "correctAnswer": "A",
+    "isInformational": false
+  },
+  {
+    "id": "ai102-002",
+    "text": "You are creating a Language Understanding (LUIS) model for a smart home automation system. Which entity type should you use to capture the room name in the following utterance: 'Turn on the lights in the kitchen'?",
+    "hasTranslation": true,
+    "textRu": "Вы создаете модель Language Understanding (LUIS) для системы умного дома. Какой тип сущности следует использовать для захвата названия комнаты в следующем высказывании: 'Включи свет на кухне'?",
+    "answers": [
+      {
+        "label": "A",
+        "text": "List entity"
+      },
+      {
+        "label": "B",
+        "text": "Simple entity"
+      },
+      {
+        "label": "C",
+        "text": "Composite entity"
+      },
+      {
+        "label": "D",
+        "text": "Hierarchical entity"
+      }
+    ],
+    "correctAnswer": "A",
+    "isInformational": false
+  },
+  {
+    "id": "ai102-003",
+    "text": "You are building a question answering solution using Azure Cognitive Services. You need to provide answers to frequently asked questions from a knowledge base. Which service should you use?",
+    "hasTranslation": true,
+    "textRu": "Вы создаете решение для ответов на вопросы с использованием Azure Cognitive Services. Вам необходимо предоставить ответы на часто задаваемые вопросы из базы знаний. Какой сервис следует использовать?",
+    "answers": [
+      {
+        "label": "A",
+        "text": "Azure Bot Framework"
+      },
+      {
+        "label": "B",
+        "text": "Language Understanding (LUIS)"
+      },
+      {
+        "label": "C",
+        "text": "QnA Maker"
+      },
+      {
+        "label": "D",
+        "text": "Text Analytics"
+      }
+    ],
+    "correctAnswer": "C",
+    "isInformational": false
+  },
+  {
+    "id": "ai102-004",
+    "text": "You are implementing an Azure Form Recognizer solution to process invoices. Which API version provides pre-built models for invoices?",
+    "hasTranslation": true,
+    "textRu": "Вы внедряете решение Azure Form Recognizer для обработки счетов-фактур. Какая версия API предоставляет предварительно созданные модели для счетов-фактур?",
+    "answers": [
+      {
+        "label": "A",
+        "text": "v1.0"
+      },
+      {
+        "label": "B",
+        "text": "v2.0"
+      },
+      {
+        "label": "C",
+        "text": "v2.1"
+      },
+      {
+        "label": "D",
+        "text": "v3.0"
+      }
+    ],
+    "correctAnswer": "C",
+    "isInformational": false
+  },
+  {
+    "id": "ai102-005",
+    "text": "You need to create a custom vision model that can identify different dog breeds in images. Which type of project should you create?",
+    "hasTranslation": true,
+    "textRu": "Вам нужно создать модель пользовательского компьютерного зрения, которая может идентифицировать различные породы собак на изображениях. Какой тип проекта следует создать?",
+    "answers": [
+      {
+        "label": "A",
+        "text": "Object Detection"
+      },
+      {
+        "label": "B",
+        "text": "Classification"
+      },
+      {
+        "label": "C",
+        "text": "Image Analysis"
+      },
+      {
+        "label": "D",
+        "text": "Face Detection"
+      }
+    ],
+    "correctAnswer": "B",
+    "isInformational": false
+  }
+] 

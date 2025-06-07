@@ -11,15 +11,15 @@ export interface QuizInfo {
 export const availableQuizzes: QuizInfo[] = [
   {
     id: 'az400',
-    name: 'AZ-400 Certification Quiz',
+    name: 'AZ-400: DevOps Engineer',
     description: 'Microsoft Azure DevOps Solutions certification practice questions',
-    fileName: 'az400-questions.json'
+    fileName: 'AzureDevOps.json'
   },
   {
-    id: 'azure_devops',
-    name: 'Azure DevOps Practice',
-    description: 'Practice questions covering Azure DevOps concepts and features',
-    fileName: 'AzureDevOps.json'
+    id: 'ai102',
+    name: 'AI-102: AI Engineer',
+    description: 'Microsoft Azure AI Engineer certification practice questions',
+    fileName: 'AI102.json'
   }
   // Новые квизы можно добавлять здесь
 ];
