@@ -4,7 +4,7 @@ import Quiz from './components/Quiz';
 import QuizSelector from './components/QuizSelector';
 import ModeSelector from './components/ModeSelector';
 import { Question, parseQuestions } from './utils/questionParser';
-import MinimalHeader from './components/MinimalHeader';
+// import MinimalHeader from './components/MinimalHeader';
 import { shuffleArray } from './utils/shuffle';
 import Footer from './components/Footer';
 import Auth from './components/Auth';
@@ -14,10 +14,8 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [shuffledQuestions, setShuffledQuestions] = useState<Question[]>([]);
-  const [isFileUploaded, setIsFileUploaded] = useState(false);
   const [showFileUpload, setShowFileUpload] = useState(false);
   const [showQuizSelector, setShowQuizSelector] = useState(true);
-  const [currentQuizName, setCurrentQuizName] = useState<string>('');
   const [language, setLanguage] = useState<'en' | 'ru'>('en');
   const [darkMode, setDarkMode] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -34,40 +32,29 @@ function App() {
     setIsAuthenticated(true);
   };
 
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    handleReturnToQuizSelector();
-  };
-
   const handleFileUpload = (content: string, fileName: string) => {
     const parsedQuestions = parseQuestions(content);
     setQuestions(parsedQuestions);
     setShuffledQuestions(parsedQuestions);
-    setIsFileUploaded(true);
     setShowFileUpload(false);
     setShowQuizSelector(false);
-    setCurrentQuizName('Custom Quiz');
     setShowModeSelector(true);
   };
 
   const handleQuizSelect = (selectedQuestions: Question[], quizName: string) => {
     setQuestions(selectedQuestions);
     setShuffledQuestions(selectedQuestions);
-    setIsFileUploaded(true);
     setShowQuizSelector(false);
-    setCurrentQuizName(quizName);
     setShowModeSelector(true);
   };
 
   const handleReturnToQuizSelector = () => {
-    setIsFileUploaded(false);
     setQuestions([]);
     setShuffledQuestions([]);
     setShowQuizSelector(true);
     setShowFileUpload(false);
     setQuizMode(null);
     setShowModeSelector(false);
-    setCurrentQuizName('');
   };
 
   const handleShowFileUpload = () => {
@@ -90,7 +77,7 @@ function App() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <MinimalHeader
+      {/* <MinimalHeader
         language={language}
         setLanguage={setLanguage}
         darkMode={darkMode}
@@ -99,7 +86,7 @@ function App() {
         isLearnMode={quizMode === 'learn'}
         currentQuizName={currentQuizName}
         onLogout={handleLogout}
-      />
+      /> */}
       <main className="flex-1 app-content">
         {showQuizSelector ? (
           <QuizSelector 
